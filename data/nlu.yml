@@ -1,0 +1,126 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
+
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+
+- intent: ask_weather
+  examples: |
+    - What's the weather in [New York](location)?
+    - Tell me the weather in [Los Angeles](location).
+    - How's the weather in [London](location)?
+    - What's the weather like in [Tokyo](location)?
+    - Weather forecast for [Chicago](location), please.
+
+- intent: ask_time
+  examples: |
+    - What's the time in [New York](location)?
+    - What time is it in [Dublin](location)?
+    - Tell me the time in [Los Angeles](location).
+    - How's the time in [London](location)?
+    - What's the time like in [Tokyo](location)?
+    - Time for [Chicago](location), please.
+
+- intent: ask_date
+  examples: |
+    - What's the date in [New York](location)?
+    - Tell me the date in [Los Angeles](location).
+    - How's the date in [London](location)?
+    - What's the date like in [Tokyo](location)?
+    - Date for [Chicago](location), please.
+
+- intent: ask_weather_forecast
+  examples: |
+    - What will the weather be in [New York](location) tomorrow?
+    - What is the weather in [New York](location) tomorrow?
+    - What is the forecast for the weather in [New York](location) tomorrow?
+    - Tell me the weather forecast for [Los Angeles](location).
+    - How's the weather in [London](location) next week?
+    - What's the weather like in [Tokyo](location) this weekend?
+    - Weather forecast for [Chicago](location) next month, please.

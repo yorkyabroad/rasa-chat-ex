@@ -135,6 +135,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+datae.env
+.env.example
 
 # Spyder project settings
 .spyderproject
@@ -172,3 +174,16 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Cursor  
+#  Cursor is an AI-powered code editor.`.cursorignore` specifies files/directories to 
+#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
+#  refer to https://docs.cursor.com/context/ignore-files
+.cursorignore
+.cursorindexingignore
+
+#Misc files
+# ignore output models
+models
+tests
+.rasa
