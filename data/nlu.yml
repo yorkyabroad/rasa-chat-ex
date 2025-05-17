@@ -124,3 +124,13 @@ nlu:
     - How's the weather in [London](location) next week?
     - What's the weather like in [Tokyo](location) this weekend?
     - Weather forecast for [Chicago](location) next month, please.
+
+- intent: compare_weather
+  examples: |
+    - How does the weather in [London](location) compare to average?
+    - Is it warmer than usual in [New York](location)?
+    - Compare [Paris](location) weather to normal
+    - Is [Tokyo](location) colder than average today?
+    - How does today's temperature in [Berlin](location) compare to the average?
+    - Is [Sydney](location) weather normal for this time of year?
+    - Compare [Moscow](location) temperature to seasonal average

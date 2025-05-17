@@ -48,3 +48,7 @@ rules:
     - intent: ask_time
     - action: action_get_local_time
 
+- rule: Compare weather to average when asked
+  steps:
+  - intent: compare_weather
+  - action: action_compare_weather

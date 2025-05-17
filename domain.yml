@@ -12,6 +12,7 @@ intents:
   - ask_weather  # Add this intent
   - ask_time     # Add this intent
   - ask_weather_forecast  # Add this intent
+  - compare_weather  # Add this intent
   - inform       # Add this intent
   - random_fact  # Add this intent
 
@@ -21,6 +22,7 @@ actions:
   - action_fetch_weather_forecast
   - action_get_local_time
   - action_random_fact
+  - action_compare_weather
 
 entities:
   - number_of_people
