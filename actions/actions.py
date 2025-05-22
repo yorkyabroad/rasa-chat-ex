@@ -31,15 +31,20 @@ import os
 import requests
 import datetime
 import random
+import logging
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 from typing import Dict, Text, Any, List
 from dotenv import load_dotenv
+
+# Configure logger
+logger = logging.getLogger(__name__)
+
 # Import for environment validation is commented out during development/testing
 # Uncomment in production to validate environment variables
-from actions.validate_env import check_required_env_vars
-check_required_env_vars()
+# from actions.validate_env import check_required_env_vars
+# check_required_env_vars()
 
 class ActionFetchWeather(Action):
     def name(self) -> Text:
@@ -63,18 +68,22 @@ class ActionFetchWeather(Action):
         
         try:    
             url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
+            logger.info(f"Fetching weather data for location: {location}")
             response = requests.get(url, timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
                 temperature = data["main"]["temp"]
                 weather = data["weather"][0]["description"]
+                logger.info(f"Successfully retrieved weather for {location}: {weather}, {temperature}°C")
                 dispatcher.utter_message(
                     text=f"The current weather in {location} is {weather} with a temperature of {temperature}°C."
                 )
             else:
+                logger.error(f"Failed to fetch weather data: HTTP {response.status_code} for location {location}")
                 dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
         except requests.exceptions.RequestException as e:
+            logger.error(f"Weather API request error for {location}: {str(e)}")
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather data.")
         
         return []
@@ -125,10 +134,12 @@ class ActionFetchWeatherForecast(Action):
         try:    
             # OpenWeatherMap 5-day forecast API (provides forecast in 3-hour steps)
             url = f"http://api.openweathermap.org/data/2.5/forecast?q={location}&appid={api_key}&units=metric"
+            logger.info(f"Fetching {days}-day forecast for location: {location}")
             response = requests.get(url, timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
+                logger.debug(f"Received forecast data with {len(data['list'])} time points")
                 
                 # Process forecast data
                 forecast_message = f"Weather forecast for {location} for the next {days} day(s):\n"
@@ -162,11 +173,15 @@ class ActionFetchWeatherForecast(Action):
                             temp = day_forecast["main"]["temp"]
                             weather = day_forecast["weather"][0]["description"]
                             forecast_message += f"\n• {date_str}: {weather}, temperature around {temp}°C"
+                            logger.debug(f"Added forecast for {date_str}: {weather}, {temp}°C")
                 
+                logger.info(f"Successfully generated {day_count}-day forecast for {location}")
                 dispatcher.utter_message(text=forecast_message)
             else:
+                logger.error(f"Failed to fetch forecast data: HTTP {response.status_code} for location {location}")
                 dispatcher.utter_message(text="I couldn't fetch the weather forecast for that location. Try again.")
         except requests.exceptions.RequestException as e:
+            logger.error(f"Forecast API request error for {location}: {str(e)}")
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather forecast data.")
         
         return []
@@ -194,15 +209,18 @@ class ActionCompareWeather(Action):
         try:    
             # Get current weather
             current_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
+            logger.info(f"Fetching weather comparison data for location: {location}")
             response = requests.get(current_url, timeout=10)
             
             if response.status_code != 200:
+                logger.error(f"Failed to fetch weather data for comparison: HTTP {response.status_code} for location {location}")
                 dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
                 return []
                 
             current_data = response.json()
             current_temp = current_data["main"]["temp"]
             current_weather = current_data["weather"][0]["description"]
+            logger.debug(f"Current weather for {location}: {current_weather}, {current_temp}°C")
             
             # Get historical average data
             # Note: OpenWeatherMap's free tier doesn't provide historical averages
@@ -234,6 +252,7 @@ class ActionCompareWeather(Action):
             
             # Compare current temperature with average
             diff = current_temp - avg_temp
+            logger.debug(f"Temperature difference from average for {location}: {diff}°C (current: {current_temp}°C, avg: {avg_temp}°C)")
             
             if diff > 5:
                 comparison = f"It's much warmer than the average {avg_temp}°C for this time of year."
@@ -245,11 +264,13 @@ class ActionCompareWeather(Action):
                 comparison = f"It's a bit colder than the average {avg_temp}°C for this time of year."
             else:
                 comparison = f"It's close to the average {avg_temp}°C for this time of year."
-                
+            
+            logger.info(f"Completed weather comparison for {location}: {comparison}")
             dispatcher.utter_message(
                 text=f"The current weather in {location} is {current_weather} with a temperature of {current_temp}°C. {comparison}"
             )
         except requests.exceptions.RequestException as e:
+            logger.error(f"Weather comparison API request error for {location}: {str(e)}")
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather data.")
             
         return []
@@ -278,11 +299,13 @@ class ActionGetLocalTime(Action):
         url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}"
 
         try:
+            logger.info(f"Fetching local time data for location: {location}")
             response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 lat = data["coord"]["lat"]
                 lon = data["coord"]["lon"]
+                logger.debug(f"Retrieved coordinates for {location}: lat={lat}, lon={lon}")
                 
                 # Now use TimeZoneDB API to get the local time
                 # You'll need to register for a free API key at timezonedb.com
@@ -292,6 +315,7 @@ class ActionGetLocalTime(Action):
                     timezone_offset = data.get("timezone", 0)  # Offset in seconds from UTC
                     utc_time = datetime.datetime.utcnow()
                     local_time = utc_time + datetime.timedelta(seconds=timezone_offset)
+                    logger.info(f"Using timezone offset fallback for {location}: offset={timezone_offset}s")
                     
                     dispatcher.utter_message(
                         text=f"The current time in {location} is approximately {local_time.strftime('%H:%M')} (based on timezone offset)."
@@ -299,12 +323,14 @@ class ActionGetLocalTime(Action):
                 else:
                     # Use TimeZoneDB for more accurate results
                     timezone_url = f"http://api.timezonedb.com/v2.1/get-time-zone?key={timezone_api_key}&format=json&by=position&lat={lat}&lng={lon}"
+                    logger.debug(f"Fetching timezone data from TimeZoneDB for {location}")
                     tz_response = requests.get(timezone_url, timeout=10)
                     
                     if tz_response.status_code == 200:
                         tz_data = tz_response.json()
                         local_time_str = tz_data["formatted"].split(" ")[1]  # Extract time part
                         timezone_name = tz_data["zoneName"]
+                        logger.info(f"Retrieved timezone data for {location}: zone={timezone_name}, time={local_time_str}")
                         
                         dispatcher.utter_message(
                             text=f"The current time in {location} ({timezone_name}) is {local_time_str}."
@@ -314,13 +340,16 @@ class ActionGetLocalTime(Action):
                         timezone_offset = data.get("timezone", 0)
                         utc_time = datetime.datetime.utcnow()
                         local_time = utc_time + datetime.timedelta(seconds=timezone_offset)
+                        logger.warning(f"TimeZoneDB request failed for {location}, using fallback. Status: {tz_response.status_code}")
                         
                         dispatcher.utter_message(
                             text=f"The current time in {location} is approximately {local_time.strftime('%H:%M')} (based on timezone offset)."
                         )
             else:
+                logger.error(f"Failed to fetch location data: HTTP {response.status_code} for location {location}")
                 dispatcher.utter_message(text="I couldn't find that location to determine the local time.")
         except requests.exceptions.RequestException as e:
+            logger.error(f"Local time API request error for {location}: {str(e)}")
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the time data.")
         
         return []

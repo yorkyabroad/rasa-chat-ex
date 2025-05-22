@@ -1,13 +1,17 @@
 # See this guide on how to implement these action:
+# https://rasa.com/docs/rasa/custom-actions
+
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 try:
     import rasa_sdk
     import requests
     import dotenv
     # All required packages are installed!
-    import sys
-    sys.stderr.write("All required packages are installed!\n")
+    logger.info("All required packages are installed!")
 except ImportError as e:
-    # Log the missing package to stderr instead of using print
-    import sys
-    sys.stderr.write(f"Missing package: {e}\n")
+    # Log the missing package
+    logger.error(f"Missing package: {e}")

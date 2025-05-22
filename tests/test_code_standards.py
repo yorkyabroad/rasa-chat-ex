@@ -1,6 +1,8 @@
 import os
 import unittest
 import glob
+import re
+import ast
 
 class TestCodeStandards(unittest.TestCase):
     def test_copyright_notice(self):
@@ -121,6 +123,65 @@ class TestCodeStandards(unittest.TestCase):
         # Assert that there are no violations
         if violations:
             self.fail("Naming convention violations found:\n" + "\n".join(violations))
+
+    def test_proper_logging(self):
+        """Test that Python files use proper logging instead of print statements."""
+        # Get the project root directory
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        
+        # Find all Python files in the project (excluding tests and certain directories)
+        python_files = []
+        for root, dirs, files in os.walk(project_root):
+            # Skip test directories and other excluded directories
+            if any(excluded in root for excluded in [".git", "__pycache__", ".pytest_cache", "venv", "env", "tests"]):
+                continue
+                
+            for file in files:
+                if file.endswith(".py"):
+                    python_files.append(os.path.join(root, file))
+        
+        # Check each file for proper logging
+        files_without_logging = []
+        files_with_incorrect_logging = []
+        
+        for file_path in python_files:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                
+                # Skip empty files or very small files
+                if len(content.strip()) < 50:
+                    continue
+                
+                # Check if the file imports logging
+                has_logging_import = re.search(r'import\s+logging|from\s+logging\s+import', content) is not None
+                
+                # Check if the file configures a logger
+                has_logger_config = re.search(r'logger\s*=\s*logging\.getLogger', content) is not None
+                
+                # Check if the file uses logging methods
+                uses_logging = re.search(r'logger\.(debug|info|warning|error|critical)', content) is not None
+                
+                # Check for error handling that should use logging
+                has_exceptions = re.search(r'except\s+', content) is not None
+                uses_error_logging = re.search(r'logger\.error|logger\.exception', content) is not None
+                
+                # Files with exception handling should use error logging
+                if has_exceptions and not uses_error_logging:
+                    files_with_incorrect_logging.append(
+                        f"{os.path.relpath(file_path, project_root)}: Has exception handling but doesn't use logger.error()"
+                    )
+                
+                # Files with significant content should use logging
+                if len(content.strip()) > 200 and not (has_logging_import and has_logger_config and uses_logging):
+                    files_without_logging.append(os.path.relpath(file_path, project_root))
+        
+        # Assert that all significant files use logging
+        if files_without_logging:
+            self.fail(f"The following files don't properly implement logging: {', '.join(files_without_logging)}")
+        
+        # Assert that exception handling uses error logging
+        if files_with_incorrect_logging:
+            self.fail("Logging issues found:\n" + "\n".join(files_with_incorrect_logging))
 
 if __name__ == "__main__":
     unittest.main()
