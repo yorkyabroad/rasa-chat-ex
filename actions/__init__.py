@@ -5,6 +5,12 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 import logging
+# actions/__init__.py
+from actions.logging_config import setup_logging
+
+# Set up logging for the entire package
+logger = setup_logging()
+logger.info("Initializing actions module")
 
 # Configure logger
 logger = logging.getLogger(__name__)

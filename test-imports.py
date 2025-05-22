@@ -2,6 +2,8 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 import logging
+from actions.logging_config import setup_logging
+logger = setup_logging()
 
 # Configure logger
 logger = logging.getLogger(__name__)
