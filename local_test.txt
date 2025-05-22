@@ -27,3 +27,7 @@ pytest -v
 
 # Run tests with coverage report
 pytest --cov=actions
+
+
+
+python -m pytest tests/test_code_standards.py -v
