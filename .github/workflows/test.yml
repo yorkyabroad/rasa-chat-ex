@@ -43,9 +43,3 @@ jobs:
         slug: yorkyabroad/rasa-chat-ex
         file: ./coverage.xml
         fail_ci_if_error: false
-        
-    - name: Upload coverage as artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage-report
-        path: ./coverage.xml
