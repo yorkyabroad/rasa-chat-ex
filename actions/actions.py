@@ -36,6 +36,10 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 from typing import Dict, Text, Any, List
 from dotenv import load_dotenv
+# Import for environment validation is commented out during development/testing
+# Uncomment in production to validate environment variables
+from actions.validate_env import check_required_env_vars
+check_required_env_vars()
 
 class ActionFetchWeather(Action):
     def name(self) -> Text:
