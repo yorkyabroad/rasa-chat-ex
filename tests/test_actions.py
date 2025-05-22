@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import datetime
 import json
-from actions.actions import ActionRandomFact, ActionCompareWeather, ActionFetchWeather
+from actions.actions import ActionRandomFact, ActionCompareWeather, ActionFetchWeather, ActionGetLocalTime
 
 
 class TestActionRandomFact(unittest.TestCase):
@@ -121,6 +121,130 @@ class TestActionFetchWeather(unittest.TestCase):
         domain = MagicMock()
         
         action = ActionFetchWeather()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the appropriate message was sent
+        dispatcher.utter_message.assert_called_once_with(
+            text="I couldn't find the location. Could you please provide it?"
+        )
+
+
+class TestActionGetLocalTime(unittest.TestCase):
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    @patch('actions.actions.datetime')
+    def test_run_with_location_timezone_api(self, mock_datetime, mock_requests_get, mock_env_get, mock_load_dotenv):
+        # Mock the datetime
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime(2023, 6, 15, 12, 0, 0)
+        
+        # Mock the API keys
+        def get_env_var(var_name):
+            if var_name == "OPENWEATHER_API_KEY":
+                return "fake_weather_key"
+            elif var_name == "TIMEZONE_API_KEY":
+                return "fake_timezone_key"
+            return None
+        
+        mock_env_get.side_effect = get_env_var
+        
+        # Mock the first API response (OpenWeatherMap)
+        weather_response = MagicMock()
+        weather_response.status_code = 200
+        weather_response.json.return_value = {
+            "coord": {"lat": 51.5074, "lon": -0.1278},
+            "timezone": 3600  # UTC+1
+        }
+        
+        # Mock the second API response (TimeZoneDB)
+        timezone_response = MagicMock()
+        timezone_response.status_code = 200
+        timezone_response.json.return_value = {
+            "formatted": "2023-06-15 13:00:00",  # UTC+1
+            "zoneName": "Europe/London"
+        }
+        
+        # Set up the requests.get to return different responses
+        mock_requests_get.side_effect = [weather_response, timezone_response]
+        
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = "London"
+        domain = MagicMock()
+        
+        action = ActionGetLocalTime()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the APIs were called with the right URLs
+        self.assertEqual(mock_requests_get.call_count, 2)
+        self.assertIn("London", mock_requests_get.call_args_list[0][0][0])
+        self.assertIn("lat=51.5074", mock_requests_get.call_args_list[1][0][0])
+        self.assertIn("lng=-0.1278", mock_requests_get.call_args_list[1][0][0])
+        
+        # Check that the message contains the expected time info
+        dispatcher.utter_message.assert_called_once()
+        message = dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("London", message)
+        self.assertIn("Europe/London", message)
+        self.assertIn("13:00", message)
+    
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    @patch('actions.actions.datetime')
+    def test_run_with_location_fallback(self, mock_datetime, mock_requests_get, mock_env_get, mock_load_dotenv):
+        # Mock the datetime
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime(2023, 6, 15, 12, 0, 0)
+        
+        # Mock the API keys - only weather API key available
+        def get_env_var(var_name):
+            if var_name == "OPENWEATHER_API_KEY":
+                return "fake_weather_key"
+            return None
+        
+        mock_env_get.side_effect = get_env_var
+        
+        # Mock the API response
+        weather_response = MagicMock()
+        weather_response.status_code = 200
+        weather_response.json.return_value = {
+            "coord": {"lat": 51.5074, "lon": -0.1278},
+            "timezone": 3600  # UTC+1
+        }
+        
+        mock_requests_get.return_value = weather_response
+        
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = "London"
+        domain = MagicMock()
+        
+        action = ActionGetLocalTime()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the API was called with the right URL
+        mock_requests_get.assert_called_once()
+        self.assertIn("London", mock_requests_get.call_args[0][0])
+        
+        # Check that the message contains the expected time info using fallback method
+        dispatcher.utter_message.assert_called_once()
+        message = dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("London", message)
+        self.assertIn("13:00", message)  # UTC+1 (12:00 + 1 hour)
+        self.assertIn("based on timezone offset", message)
+    
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    def test_run_without_location(self, mock_env_get, mock_load_dotenv):
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = None  # No location provided
+        domain = MagicMock()
+        
+        action = ActionGetLocalTime()
         action.run(dispatcher, tracker, domain)
         
         # Check that the appropriate message was sent
