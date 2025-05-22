@@ -1,0 +1,29 @@
+#To run tests locally
+#
+#Directory Structure:
+#
+# chat/rasa-chat/
+# ├── actions/
+# │   ├── __init__.py
+# │   └── actions.py
+# ├── tests/
+# │   ├── __init__.py
+# │   └── test_actions.py
+# ├── .github/
+# │   └── workflows/
+# │       └── test.yml
+# ├── pytest.ini
+# └── requirements-dev.txt
+#
+
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run tests
+pytest
+
+# Run tests with verbose output
+pytest -v
+
+# Run tests with coverage report
+pytest --cov=actions
