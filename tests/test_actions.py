@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import datetime
 import json
-from actions.actions import ActionRandomFact, ActionCompareWeather, ActionFetchWeather, ActionGetLocalTime
+import requests
+from actions.actions import ActionRandomFact, ActionCompareWeather, ActionFetchWeather, ActionFetchWeatherForecast, ActionGetLocalTime
 
 
 class TestActionRandomFact(unittest.TestCase):
@@ -266,3 +267,87 @@ class TestActionGetLocalTime(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class TestActionFetchWeatherForecast(unittest.TestCase):
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_location(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        # Mock the API key
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Create a mock forecast response with data for 3 days
+        forecast_data = {
+            "list": [
+                # Day 1 - noon forecast
+                {
+                    "dt": int(datetime.datetime(2023, 6, 15, 12, 0).timestamp()),
+                    "main": {"temp": 22.5},
+                    "weather": [{"description": "sunny"}]
+                },
+                # Day 2 - noon forecast
+                {
+                    "dt": int(datetime.datetime(2023, 6, 16, 12, 0).timestamp()),
+                    "main": {"temp": 24.0},
+                    "weather": [{"description": "partly cloudy"}]
+                },
+                # Day 3 - noon forecast
+                {
+                    "dt": int(datetime.datetime(2023, 6, 17, 12, 0).timestamp()),
+                    "main": {"temp": 21.0},
+                    "weather": [{"description": "light rain"}]
+                }
+            ]
+        }
+        
+        # Mock the API response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = forecast_data
+        mock_requests_get.return_value = mock_response
+        
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.side_effect = lambda slot_name: "Paris" if slot_name == "location" else 3
+        domain = MagicMock()
+        
+        action = ActionFetchWeatherForecast()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the API was called with the right URL
+        mock_requests_get.assert_called_once()
+        self.assertIn("Paris", mock_requests_get.call_args[0][0])
+        
+        # Check that the message contains forecast information
+        dispatcher.utter_message.assert_called_once()
+        message = dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("Paris", message)
+        self.assertIn("3 day(s)", message)
+        self.assertIn("sunny", message)
+        self.assertIn("partly cloudy", message)
+        self.assertIn("light rain", message)
+    
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_api_error_handling(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        # Mock the API key
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock the API to raise an exception
+        mock_requests_get.side_effect = requests.exceptions.RequestException("Connection error")
+        
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = "Paris"
+        domain = MagicMock()
+        
+        action = ActionFetchWeatherForecast()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the error message was sent
+        dispatcher.utter_message.assert_called_once_with(
+            text="Sorry, I encountered an error while fetching the weather forecast data."
+        )
