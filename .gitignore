@@ -187,3 +187,8 @@ cython_debug/
 models
 tests
 .rasa
+
+#pytest
+# ignore local test coverage
+htmlcov
+coverage.xml
