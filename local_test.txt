@@ -31,3 +31,5 @@ pytest --cov=actions
 
 
 python -m pytest tests/test_code_standards.py -v
+
+python -m pytest tests/test_code_standards.py -v -W ignore::DeprecationWarning
