@@ -44,15 +44,52 @@ rasa shell
 User: "What's the weather like in London?"
 Bot: *Provides current weather information for London*
 
+User: "How's the weather in San Francisco right now?"
+Bot: *Provides current weather information for San Francisco*
+
+User: "Tell me about the current conditions in Sydney"
+Bot: *Provides current weather information for Sydney*
+
 ### 2. Weather Forecast
 
 User: "Will it rain tomorrow in Paris?"
 Bot: *Provides weather forecast for Paris*
 
+User: "What's the weather going to be like this weekend in Berlin?"
+Bot: *Provides weekend forecast for Berlin*
+
+User: "Do I need an umbrella in Toronto on Friday?"
+Bot: *Provides precipitation forecast for Toronto on Friday*
+
 ### 3. Specific Weather Attributes
 
 User: "How's the humidity in Tokyo?"
 Bot: *Provides humidity information for Tokyo*
+
+User: "What's the wind speed in Chicago today?"
+Bot: *Provides wind speed information for Chicago*
+
+User: "How hot will it get in Dubai tomorrow?"
+Bot: *Provides temperature forecast for Dubai*
+
+### 4. Time-Based Weather Queries
+
+User: "What's the weather like in London at 3pm?"
+Bot: *Provides weather forecast for London at 3pm*
+
+User: "Will it be cold tonight in Montreal?"
+Bot: *Provides evening temperature forecast for Montreal*
+
+User: "What's the morning forecast for Singapore?"
+Bot: *Provides morning weather forecast for Singapore*
+
+### 5. Comparative Weather Queries
+
+User: "Is it warmer in Miami or Los Angeles today?"
+Bot: *Compares temperatures between Miami and Los Angeles*
+
+User: "Which is rainier this week, Seattle or Portland?"
+Bot: *Compares precipitation forecasts between Seattle and Portland*
 
 ## Conversation Examples
 

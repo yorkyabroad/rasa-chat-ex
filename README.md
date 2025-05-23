@@ -118,7 +118,7 @@ The chatbot implements custom actions in `actions/actions.py`:
 
 ## License
 
-[Add your license information here]
+See LICENSE file
 
 ## Acknowledgments
 
