@@ -1,67 +1,31 @@
-# This files contains your custom actions which can be used to run
-# custom Python code.
-#
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
-
-# This is a simple example for a custom action which utters "Hello World!"
-
-# from typing import Any, Text, Dict, List
-#
-# from rasa_sdk import Action, Tracker
-# from rasa_sdk.executor import CollectingDispatcher
-#
-#
-# class ActionHelloWorld(Action):
-#
-#     def name(self) -> Text:
-#         return "action_hello_world"
-#
-#     def run(self, dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-#
-#         dispatcher.utter_message(text="Hello World!")
-#
-#         return []
-
-
 import os
-import requests
-import datetime
 import random
 import logging
+import datetime
+import requests
+from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet
-from typing import Dict, Text, Any, List
 from dotenv import load_dotenv
 
-# Configure logger
 logger = logging.getLogger(__name__)
-
-# Import for environment validation is commented out during development/testing
-# Uncomment in production to validate environment variables
-from actions.validate_env import check_required_env_vars
-check_required_env_vars()
 
 class ActionFetchWeather(Action):
     def name(self) -> Text:
         return "action_fetch_weather"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         location = tracker.get_slot("location")
         if not location:
             dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
             return []
 
-        # Load environment variables
         load_dotenv()
-        
-        # Get API key from environment variable
         api_key = os.environ.get("OPENWEATHER_API_KEY")
-
         if not api_key:
             dispatcher.utter_message(text="Weather service is currently unavailable.")
             return []
@@ -92,7 +56,8 @@ class ActionRandomFact(Action):
     def name(self) -> Text:
         return "action_random_fact"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         facts = [
             "Did you know honey never spoils?",
             "Octopuses have three hearts.",
@@ -101,38 +66,148 @@ class ActionRandomFact(Action):
         dispatcher.utter_message(text=random.choice(facts))
         return []
 
+class ActionCompareWeather(Action):
+    def name(self) -> Text:
+        return "action_compare_weather"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        location = tracker.get_slot("location")
+        if not location:
+            dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
+            return []
+
+        load_dotenv()
+        api_key = os.environ.get("OPENWEATHER_API_KEY")
+        if not api_key:
+            dispatcher.utter_message(text="Weather service is currently unavailable.")
+            return []
+        
+        try:    
+            current_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
+            logger.info(f"Fetching weather comparison data for location: {location}")
+            response = requests.get(current_url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                current_temp = data["main"]["temp"]
+                weather = data["weather"][0]["description"]
+                
+                avg_temp = 22.0
+                temp_diff = current_temp - avg_temp
+                
+                if abs(temp_diff) < 2:
+                    comparison = "about average"
+                elif temp_diff > 5:
+                    comparison = "much warmer"
+                elif temp_diff > 2:
+                    comparison = "warmer"
+                elif temp_diff < -5:
+                    comparison = "much colder"
+                else:
+                    comparison = "colder"
+                
+                dispatcher.utter_message(
+                    text=f"The current temperature in {location} is {current_temp}°C, which is {comparison} than average for this time of year."
+                )
+            else:
+                logger.error(f"Failed to fetch weather data: HTTP {response.status_code} for location {location}")
+                dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Weather comparison API request error for {location}: {str(e)}")
+            dispatcher.utter_message(text="Sorry, I encountered an error while comparing weather data.")
+        
+        return []
+
+class ActionGetLocalTime(Action):
+    def name(self) -> Text:
+        return "action_get_local_time"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        location = tracker.get_slot("location")
+        if not location:
+            dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
+            return []
+
+        load_dotenv()
+        weather_api_key = os.environ.get("OPENWEATHER_API_KEY")
+        timezone_api_key = os.environ.get("TIMEZONE_API_KEY")
+
+        if not weather_api_key:
+            dispatcher.utter_message(text="Location service is currently unavailable.")
+            return []
+
+        try:
+            weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={weather_api_key}"
+            logger.info(f"Fetching coordinates for location: {location}")
+            weather_response = requests.get(weather_url, timeout=10)
+
+            if weather_response.status_code != 200:
+                logger.error(f"Failed to fetch location data: HTTP {weather_response.status_code}")
+                dispatcher.utter_message(text="I couldn't find that location. Please try again.")
+                return []
+
+            weather_data = weather_response.json()
+            lat = weather_data["coord"]["lat"]
+            lon = weather_data["coord"]["lon"]
+            timezone_offset = weather_data.get("timezone", 0)
+
+            if timezone_api_key:
+                timezone_url = f"http://api.timezonedb.com/v2.1/get-time-zone?key={timezone_api_key}&format=json&by=position&lat={lat}&lng={lon}"
+                logger.info(f"Fetching timezone data for coordinates: {lat}, {lon}")
+                timezone_response = requests.get(timezone_url, timeout=10)
+
+                if timezone_response.status_code == 200:
+                    timezone_data = timezone_response.json()
+                    local_time = timezone_data["formatted"]
+                    zone_name = timezone_data["zoneName"]
+                    logger.info(f"Successfully retrieved timezone data for {location}: {zone_name}")
+                    dispatcher.utter_message(
+                        text=f"The current time in {location} ({zone_name}) is {local_time.split()[1]}"
+                    )
+                    return []
+
+            utc_time = datetime.datetime.utcnow()
+            local_time = utc_time + datetime.timedelta(seconds=timezone_offset)
+            formatted_time = local_time.strftime("%H:%M")
+            logger.info(f"Calculated local time for {location} using timezone offset")
+            dispatcher.utter_message(
+                text=f"The current time in {location} is approximately {formatted_time} (based on timezone offset)"
+            )
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"API request error for {location}: {str(e)}")
+            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the local time data.")
+
+        return []
 
 class ActionFetchWeatherForecast(Action):
     def name(self) -> Text:
         return "action_fetch_weather_forecast"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         location = tracker.get_slot("location")
-        days = tracker.get_slot("days") or 3  # Default to 3 days if not specified
+        days = tracker.get_slot("days") or 3
         
-        # Convert to integer if it's a string
         if isinstance(days, str) and days.isdigit():
             days = int(days)
         elif isinstance(days, str):
-            days = 3  # Default to 3 if it's a non-numeric string
-        # Limit to 1-3 days
+            days = 3
         days = min(max(1, int(days)), 3)
         
         if not location:
             dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
             return []
 
-        # Load environment variables
         load_dotenv()
-        
-        # Get API key from environment variable
         api_key = os.environ.get("OPENWEATHER_API_KEY")
         if not api_key:
             dispatcher.utter_message(text="Weather forecast service is currently unavailable.")
             return []
         
         try:    
-            # OpenWeatherMap 5-day forecast API (provides forecast in 3-hour steps)
             url = f"http://api.openweathermap.org/data/2.5/forecast?q={location}&appid={api_key}&units=metric"
             logger.info(f"Fetching {days}-day forecast for location: {location}")
             response = requests.get(url, timeout=10)
@@ -141,28 +216,21 @@ class ActionFetchWeatherForecast(Action):
                 data = response.json()
                 logger.debug(f"Received forecast data with {len(data['list'])} time points")
                 
-                # Process forecast data
                 forecast_message = f"Weather forecast for {location} for the next {days} day(s):\n"
-                
-                # Group forecasts by day
                 current_date = None
                 day_count = 0
                 
                 for item in data["list"]:
                     forecast_date = datetime.datetime.fromtimestamp(item["dt"]).date()
                     
-                    # If we've moved to a new day
                     if forecast_date != current_date:
                         if day_count >= days:
                             break
                         
                         current_date = forecast_date
                         day_count += 1
-                        
-                        # Format the date
                         date_str = forecast_date.strftime("%A, %B %d")
                         
-                        # Get the day's weather (using noon forecast as representative)
                         noon_forecasts = [f for f in data["list"] if 
                                          datetime.datetime.fromtimestamp(f["dt"]).date() == forecast_date and
                                          datetime.datetime.fromtimestamp(f["dt"]).hour >= 11 and
@@ -186,170 +254,40 @@ class ActionFetchWeatherForecast(Action):
         
         return []
 
-
-class ActionCompareWeather(Action):
+class ActionGetHumidity(Action):
     def name(self) -> Text:
-        return "action_compare_weather"
+        return "action_get_humidity"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         location = tracker.get_slot("location")
         if not location:
             dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
             return []
 
-        # Load environment variables
         load_dotenv()
-        
-        # Get API key from environment variable
         api_key = os.environ.get("OPENWEATHER_API_KEY")
         if not api_key:
             dispatcher.utter_message(text="Weather service is currently unavailable.")
             return []
         
         try:    
-            # Get current weather
-            current_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
-            logger.info(f"Fetching weather comparison data for location: {location}")
-            response = requests.get(current_url, timeout=10)
-            
-            if response.status_code != 200:
-                logger.error(f"Failed to fetch weather data for comparison: HTTP {response.status_code} for location {location}")
-                dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
-                return []
-                
-            current_data = response.json()
-            current_temp = current_data["main"]["temp"]
-            current_weather = current_data["weather"][0]["description"]
-            logger.debug(f"Current weather for {location}: {current_weather}, {current_temp}°C")
-            
-            # Get historical average data
-            # Note: OpenWeatherMap's free tier doesn't provide historical averages
-            # This is a simplified example using a mock API or database lookup
-            # In a real implementation, you would need a weather API with historical data
-            
-            # Get current month
-            current_month = datetime.datetime.now().month
-            
-            # Mock average temperatures by month (replace with actual API call)
-            average_temps = {
-                # Replace these with actual average temperatures for the location
-                1: 5.0,   # January
-                2: 6.0,   # February
-                3: 9.0,   # March
-                4: 12.0,  # April
-                5: 16.0,  # May
-                6: 19.0,  # June
-                7: 22.0,  # July
-                8: 21.0,  # August
-                9: 18.0,  # September
-                10: 14.0, # October
-                11: 9.0,  # November
-                12: 6.0   # December
-            }
-            
-            # Get average temperature for current month
-            avg_temp = average_temps.get(current_month, 15.0)  # Default to 15°C if month not found
-            
-            # Compare current temperature with average
-            diff = current_temp - avg_temp
-            logger.debug(f"Temperature difference from average for {location}: {diff}°C (current: {current_temp}°C, avg: {avg_temp}°C)")
-            
-            if diff > 5:
-                comparison = f"It's much warmer than the average {avg_temp}°C for this time of year."
-            elif diff > 2:
-                comparison = f"It's a bit warmer than the average {avg_temp}°C for this time of year."
-            elif diff < -5:
-                comparison = f"It's much colder than the average {avg_temp}°C for this time of year."
-            elif diff < -2:
-                comparison = f"It's a bit colder than the average {avg_temp}°C for this time of year."
-            else:
-                comparison = f"It's close to the average {avg_temp}°C for this time of year."
-            
-            logger.info(f"Completed weather comparison for {location}: {comparison}")
-            dispatcher.utter_message(
-                text=f"The current weather in {location} is {current_weather} with a temperature of {current_temp}°C. {comparison}"
-            )
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Weather comparison API request error for {location}: {str(e)}")
-            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather data.")
-            
-        return []
-
-
-class ActionGetLocalTime(Action):
-    def name(self) -> Text:
-        return "action_get_local_time"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        location = tracker.get_slot("location")
-        if not location:
-            dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
-            return []
-
-        # Load environment variables
-        load_dotenv()
-        
-        # Get API key from environment variable
-        api_key = os.environ.get("OPENWEATHER_API_KEY")
-        if not api_key:
-            dispatcher.utter_message(text="Time service is currently unavailable.")
-            return []
-            
-        # First get coordinates from OpenWeatherMap
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}"
-
-        try:
-            logger.info(f"Fetching local time data for location: {location}")
+            url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
+            logger.info(f"Fetching humidity data for location: {location}")
             response = requests.get(url, timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
-                lat = data["coord"]["lat"]
-                lon = data["coord"]["lon"]
-                logger.debug(f"Retrieved coordinates for {location}: lat={lat}, lon={lon}")
-                
-                # Now use TimeZoneDB API to get the local time
-                # You'll need to register for a free API key at timezonedb.com
-                timezone_api_key = os.environ.get("TIMEZONE_API_KEY")
-                if not timezone_api_key:
-                    # Fallback to using UTC offset from weather data
-                    timezone_offset = data.get("timezone", 0)  # Offset in seconds from UTC
-                    utc_time = datetime.datetime.utcnow()
-                    local_time = utc_time + datetime.timedelta(seconds=timezone_offset)
-                    logger.info(f"Using timezone offset fallback for {location}: offset={timezone_offset}s")
-                    
-                    dispatcher.utter_message(
-                        text=f"The current time in {location} is approximately {local_time.strftime('%H:%M')} (based on timezone offset)."
-                    )
-                else:
-                    # Use TimeZoneDB for more accurate results
-                    timezone_url = f"http://api.timezonedb.com/v2.1/get-time-zone?key={timezone_api_key}&format=json&by=position&lat={lat}&lng={lon}"
-                    logger.debug(f"Fetching timezone data from TimeZoneDB for {location}")
-                    tz_response = requests.get(timezone_url, timeout=10)
-                    
-                    if tz_response.status_code == 200:
-                        tz_data = tz_response.json()
-                        local_time_str = tz_data["formatted"].split(" ")[1]  # Extract time part
-                        timezone_name = tz_data["zoneName"]
-                        logger.info(f"Retrieved timezone data for {location}: zone={timezone_name}, time={local_time_str}")
-                        
-                        dispatcher.utter_message(
-                            text=f"The current time in {location} ({timezone_name}) is {local_time_str}."
-                        )
-                    else:
-                        # Fallback to UTC offset method
-                        timezone_offset = data.get("timezone", 0)
-                        utc_time = datetime.datetime.utcnow()
-                        local_time = utc_time + datetime.timedelta(seconds=timezone_offset)
-                        logger.warning(f"TimeZoneDB request failed for {location}, using fallback. Status: {tz_response.status_code}")
-                        
-                        dispatcher.utter_message(
-                            text=f"The current time in {location} is approximately {local_time.strftime('%H:%M')} (based on timezone offset)."
-                        )
+                humidity = data["main"]["humidity"]
+                logger.info(f"Successfully retrieved humidity for {location}: {humidity}%")
+                dispatcher.utter_message(
+                    text=f"The current humidity in {location} is {humidity}%"
+                )
             else:
-                logger.error(f"Failed to fetch location data: HTTP {response.status_code} for location {location}")
-                dispatcher.utter_message(text="I couldn't find that location to determine the local time.")
+                logger.error(f"Failed to fetch weather data: HTTP {response.status_code} for location {location}")
+                dispatcher.utter_message(text="I couldn't fetch the humidity for that location. Try again.")
         except requests.exceptions.RequestException as e:
-            logger.error(f"Local time API request error for {location}: {str(e)}")
-            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the time data.")
+            logger.error(f"Weather API request error for {location}: {str(e)}")
+            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the humidity data.")
         
         return []

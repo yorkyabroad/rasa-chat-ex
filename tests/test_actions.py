@@ -3,7 +3,10 @@ from unittest.mock import patch, MagicMock
 import datetime
 import json
 import requests
-from actions.actions import ActionRandomFact, ActionCompareWeather, ActionFetchWeather, ActionFetchWeatherForecast, ActionGetLocalTime
+from actions.actions import (
+    ActionRandomFact, ActionCompareWeather, ActionFetchWeather, 
+    ActionFetchWeatherForecast, ActionGetLocalTime, ActionGetHumidity
+)
 
 
 class TestActionRandomFact(unittest.TestCase):
@@ -264,6 +267,58 @@ class TestActionGetLocalTime(unittest.TestCase):
             text="I couldn't find the location. Could you please provide it?"
         )
 
+
+class TestActionGetHumidity(unittest.TestCase):
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_location(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        # Mock the API key
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock the API response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "main": {"humidity": 75}
+        }
+        mock_requests_get.return_value = mock_response
+        
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = "London"
+        domain = MagicMock()
+        
+        action = ActionGetHumidity()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the API was called with the right URL
+        mock_requests_get.assert_called_once()
+        self.assertIn("London", mock_requests_get.call_args[0][0])
+        
+        # Check that the message contains the humidity info
+        dispatcher.utter_message.assert_called_once()
+        message = dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("London", message)
+        self.assertIn("75%", message)
+    
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    def test_run_without_location(self, mock_env_get, mock_load_dotenv):
+        # Set up the action
+        dispatcher = MagicMock()
+        tracker = MagicMock()
+        tracker.get_slot.return_value = None  # No location provided
+        domain = MagicMock()
+        
+        action = ActionGetHumidity()
+        action.run(dispatcher, tracker, domain)
+        
+        # Check that the appropriate message was sent
+        dispatcher.utter_message.assert_called_once_with(
+            text="I couldn't find the location. Could you please provide it?"
+        )
 
 if __name__ == '__main__':
     unittest.main()

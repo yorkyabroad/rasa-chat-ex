@@ -8,13 +8,18 @@ intents:
   - mood_great
   - mood_unhappy
   - bot_challenge
-  - book_table   # Add this intent
+#  - book_table   # Add this intent
   - ask_weather  # Add this intent
   - ask_time     # Add this intent
   - ask_weather_forecast  # Add this intent
   - compare_weather  # Add this intent
-  - inform       # Add this intent
+#  - inform       # Add this intent
   - random_fact  # Add this intent
+  - ask_humidity  # Intent for asking about humidity in a location
+#  - ask_local_time  # Add this intent
+#  - ask_date  # Add this intent
+#  - ask_location  # Add this intent
+#  - ask_number_of_people  # Add this intent
 
 
 actions:
@@ -23,6 +28,14 @@ actions:
   - action_get_local_time
   - action_random_fact
   - action_compare_weather
+#  - action_book_table
+#  - action_ask_number_of_people
+  - action_ask_time
+  - action_ask_date
+  - action_ask_location
+  - action_confirmation
+  - action_get_humidity  # Action for retrieving humidity data from OpenWeather API
+
 
 entities:
   - number_of_people
@@ -55,12 +68,12 @@ slots:
       - type: from_entity
         entity: location
 
-forms:
-  restaurant_form:
-    required_slots:
-      - number_of_people
-      - time
-      - date
+#forms:
+#  restaurant_form:
+#    required_slots:
+#      - number_of_people
+#      - time
+#      - date
 
 responses:
   utter_greet:
@@ -83,20 +96,20 @@ responses:
   - text: "I am a bot, powered by Rasa."
 
 
-  utter_ask_number_of_people:
-    - text: "For how many people should I book the table?"
+#  utter_ask_number_of_people:
+#    - text: "For how many people should I book the table?"
 
-  utter_ask_time:
-    - text: "What time would you like the reservation?"
+#  utter_ask_time:
+#    - text: "What time would you like the reservation?"
 
-  utter_ask_date:
-    - text: "What date should I book the table for?"
+#  utter_ask_date:
+#    - text: "What date should I book the table for?"
 
-  utter_confirmation:
-    - text: "I have reserved a table for {number_of_people} people at {time} on {date}."
+#  utter_confirmation:
+#    - text: "I have reserved a table for {number_of_people} people at {time} on {date}."
 
-  utter_ask_location:
-    - text: "For which location would you like to know the weather?"
+#  utter_ask_location:
+#    - text: "For which location would you like to know the weather?"
 
 session_config:
   session_expiration_time: 60

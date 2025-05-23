@@ -2,94 +2,99 @@
 
 ## Custom Actions
 
-### WeatherAction
+### ActionFetchWeather
 
-This custom action retrieves weather information based on user queries.
+Fetches current weather information for a specified location.
 
-#### Input Parameters
-- `location`: The city or location to get weather for
-- `time`: (Optional) Specific time for weather forecast
+**Slots Required:**
+- `location`: The city or location to fetch weather for
 
-#### Response Format
-```python
-{
-    "temperature": float,
-    "condition": str,
-    "humidity": int,
-    "wind_speed": float
-}
+**Returns:**
+- Current temperature in Celsius
+- Weather description
+
+**Example Response:**
+```
+The current weather in London is cloudy with a temperature of 18°C.
 ```
 
-#### Usage Example
-```python
-from actions.actions import WeatherAction
+### ActionFetchWeatherForecast
 
-action = WeatherAction()
-dispatcher = Dispatcher()
-tracker = Tracker()
-domain = Domain()
+Fetches weather forecast for a specified location.
 
-await action.run(dispatcher, tracker, domain)
+**Slots Required:**
+- `location`: The city or location to fetch forecast for
+- `days` (optional): Number of days to forecast (1-3, default: 3)
+
+**Returns:**
+- Daily forecasts including:
+  - Date
+  - Weather description
+  - Temperature in Celsius
+
+**Example Response:**
+```
+Weather forecast for London for the next 3 day(s):
+• Monday, June 1: partly cloudy, temperature around 19°C
+• Tuesday, June 2: sunny, temperature around 22°C
+• Wednesday, June 3: light rain, temperature around 17°C
 ```
 
-### Environment Variables
+### ActionRandomFact
 
-Required environment variables for the weather API:
+Provides a random interesting fact.
+
+**Slots Required:**
+- None
+
+**Returns:**
+- A random fact from the predefined list
+
+**Example Response:**
 ```
-WEATHER_API_KEY=your_api_key
-WEATHER_API_URL=https://api.weather.com/v1
+Did you know honey never spoils?
 ```
 
-## Conversation Flow
+### ActionCompareWeather
 
-### Intents
-- `ask_weather`: User asks for weather information
-- `provide_location`: User provides a location
-- `confirm`: User confirms an action
-- `deny`: User denies an action
+Compares current weather with historical or forecast data.
 
-### Entities
-- `location`: Geographic location
-- `time`: Time reference
-- `weather_attribute`: Specific weather attribute (temperature, humidity, etc.)
+**Slots Required:**
+- `location`: The city or location to compare weather for
 
-### Slots
-- `requested_location`: Stores the location for weather query
-- `weather_attribute`: Stores specific weather information requested
+**Returns:**
+- Weather comparison data
+
+## Error Responses
+
+All actions may return the following error messages:
+
+- "I couldn't find the location. Could you please provide it?"
+  - When the location slot is missing
+- "Weather service is currently unavailable."
+  - When the API key is missing
+- "I couldn't fetch the weather for that location. Try again."
+  - When the API request fails
+- "Sorry, I encountered an error while fetching the weather data."
+  - When an unexpected error occurs
+
+## Environment Variables
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| OPENWEATHER_API_KEY | OpenWeather API key | Yes | - |
+| RASA_ENV | Environment (development/production) | No | development |
+| LOG_LEVEL | Logging level | No | INFO |
+
+## Rate Limits
+
+- OpenWeather API: 60 calls/minute (free tier)
+- Request timeout: 10 seconds
 
 ## Error Handling
 
-The API implements the following error handling:
-1. Invalid location handling
-2. API timeout management
-3. Missing data fallbacks
-
-## Rate Limiting
-
-- Weather API calls are rate-limited to 60 requests per minute
-- Caching is implemented for frequent location queries
-
-## Testing
-
-### Unit Tests
-```bash
-python -m pytest tests/test_actions.py
-```
-
-### Integration Tests
-```bash
-python -m pytest tests/test_stories.yml
-```
-
-## Webhook Integration
-
-For external service integration, the following webhook endpoint is available:
-```
-POST /webhooks/weather
-Content-Type: application/json
-
-{
-    "location": "string",
-    "attributes": ["temperature", "humidity"]
-}
-```
+All API calls include:
+- Timeout handling
+- Error logging
+- User-friendly error messages
+- Request exception handling

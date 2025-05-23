@@ -107,13 +107,23 @@ nlu:
     - What's the time like in [Tokyo](location)?
     - Time for [Chicago](location), please.
 
-- intent: ask_date
-  examples: |
-    - What's the date in [New York](location)?
-    - Tell me the date in [Los Angeles](location).
-    - How's the date in [London](location)?
-    - What's the date like in [Tokyo](location)?
-    - Date for [Chicago](location), please.
+#- intent: ask_date
+#  examples: |
+#    - What's the date in [New York](location)?
+#    - What date is it in [Dublin](location)?
+#    - Tell me the date in [Los Angeles](location).
+#    - How's the date in [London](location)?
+#    - What's the date like in [Tokyo](location)?
+#    - Date for [Chicago](location), please.
+
+#- intent: ask_date
+#  examples: |
+#    - What's the date in [New York](location)?
+#    - What date is it in [Dublin](location)?
+#    - Tell me the date in [Los Angeles](location).
+#    - How's the date in [London](location)?
+#    - What's the date like in [Tokyo](location)?
+#    - Date for [Chicago](location), please.
 
 - intent: ask_weather_forecast
   examples: |
@@ -134,3 +144,21 @@ nlu:
     - How does today's temperature in [Berlin](location) compare to the average?
     - Is [Sydney](location) weather normal for this time of year?
     - Compare [Moscow](location) temperature to seasonal average
+
+- intent: ask_humidity
+  examples: |
+    - What is the humidity in [London](location)?
+    - Tell me the humidity in [New York](location)
+    - How humid is it in [Tokyo](location)?
+    - What's the humidity level in [Paris](location)?
+    - Current humidity in [Berlin](location)
+    - Is it humid in [Sydney](location)?
+    - Humidity for [Moscow](location), please
+
+- intent: random_fact
+  examples: |
+    - Tell me a random fact
+    - Give me a random fact
+    - I want to know a random fact
+    - Do you have a random fact?
+    - Do you have any random facts?

@@ -1,19 +1,19 @@
-# Weather Chatbot with Rasa
+# Rasa Weather Bot
 
-A conversational AI chatbot built with Rasa framework that provides weather information to users.
+A Rasa-powered chatbot that provides weather information and forecasts using the OpenWeather API.
 
 ## Features
 
-- Real-time weather information retrieval
-- Natural language understanding for weather-related queries
-- Support for multiple conversation flows
-- Automated testing and continuous integration
+- Get current weather for any location
+- Get weather forecasts for up to 3 days
+- Compare weather conditions
+- Get random interesting facts
 
 ## Prerequisites
 
-- Python 3.10 or higher
-- Rasa framework
-- Weather API credentials (see `.env.example`)
+- Python 3.8 or higher
+- Rasa 3.0 or higher
+- OpenWeather API key
 
 ## Installation
 
@@ -23,7 +23,7 @@ git clone <repository-url>
 cd rasa-chat
 ```
 
-2. Create and activate a virtual environment:
+2. Create a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -37,76 +37,67 @@ pip install -r requirements.txt
 4. Set up environment variables:
 ```bash
 cp .env.example .env
-# Edit .env with your API credentials
+```
+Edit `.env` and add your OpenWeather API key:
+```
+OPENWEATHER_API_KEY=your_api_key_here
 ```
 
-## Project Structure
+## Usage
 
-```
-├── actions/              # Custom action code
-├── data/                # Training data
-│   ├── nlu.yml         # Natural Language Understanding data
-│   ├── rules.yml       # Conversation rules
-│   └── stories.yml     # Conversation stories/flows
-├── models/              # Trained model files
-├── tests/              # Test files
-└── config.yml          # Model configuration
-```
-
-## Running the Chatbot
-
-1. Start the actions server:
-```bash
-rasa run actions
-```
-
-2. In a new terminal, start the Rasa shell:
-```bash
-rasa shell
-```
-
-## Development
-
-### Training the Model
-
-To train a new model:
+1. Train the model:
 ```bash
 rasa train
 ```
 
-### Testing
-
-Run the test suite:
+2. Start the action server:
 ```bash
-python -m pytest tests/
+rasa run actions
 ```
 
-For NLU testing:
+3. Start the Rasa server:
 ```bash
-rasa shell nlu
+rasa shell  # For command line interface
+# or
+rasa run    # For REST API
 ```
 
-### Code Quality
+## Development
 
-The project uses:
-- Pytest for testing
-- GitHub Actions for CI/CD
-- Code coverage reporting
+### Project Structure
+
+```
+rasa-chat/
+├── actions/          # Custom actions
+├── data/            # Training data
+├── models/          # Trained models
+├── tests/           # Test files
+└── config/          # Configuration files
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Adding New Actions
+
+1. Create a new action class in `actions/actions.py`
+2. Add the action to `domain.yml`
+3. Add training examples to `data/nlu.yml`
+4. Add stories to `data/stories.yml`
+5. Add any necessary tests
+
+## Environment Variables
+
+- `OPENWEATHER_API_KEY`: Your OpenWeather API key (required)
+- `RASA_ENV`: Environment (development/production)
+- `LOG_LEVEL`: Logging level (default: INFO)
 
 ## API Documentation
 
-### Custom Actions
-
-The chatbot implements custom actions in `actions/actions.py`:
-- Weather information retrieval
-- Input validation
-- Response formatting
-
-### Configuration
-
-- `config.yml`: Model pipeline and policies configuration
-- `domain.yml`: Bot responses, actions, and entities
-- `endpoints.yml`: Service endpoint configurations
+See [docs/API.md](docs/API.md) for detailed API documentation.
 
 ## Contributing
 
@@ -118,9 +109,4 @@ The chatbot implements custom actions in `actions/actions.py`:
 
 ## License
 
-See LICENSE file
-
-## Acknowledgments
-
-- Rasa framework team
-- Weather API provider
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

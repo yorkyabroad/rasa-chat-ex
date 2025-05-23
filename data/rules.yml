@@ -17,19 +17,26 @@ rules:
     - intent: greet
     - action: utter_greet
 
-- rule: Activate restaurant form
-  steps:
-    - intent: book_table
-    - action: restaurant_form
-    - active_loop: restaurant_form
+#- rule: Activate restaurant form
+#  steps:
+#    - intent: book_table
+#    - action: restaurant_form
+#    - active_loop: restaurant_form
 
-- rule: Submit restaurant form
-  condition:
-    - active_loop: restaurant_form
-  steps:
-    - action: restaurant_form
-    - active_loop: null
-    - action: utter_confirmation
+#- rule: Submit restaurant form
+#  condition:
+#    - active_loop: restaurant_form
+#  steps:
+#    - action: restaurant_form
+#    - active_loop: null
+#    - action: utter_confirmation
+
+#- rule: Submit restaurant form
+#  condition:
+#  steps:
+#    - action: restaurant_form
+#    - active_loop: null
+#    - action: utter_confirmation
 
 - rule: provide weather information
   steps:
@@ -52,3 +59,8 @@ rules:
   steps:
   - intent: compare_weather
   - action: action_compare_weather
+
+- rule: Get humidity when asked
+  steps:
+  - intent: ask_humidity
+  - action: action_get_humidity
