@@ -222,6 +222,7 @@ class TestActionFetchWeatherForecast(unittest.TestCase):
     @patch('actions.actions.requests.get')
     def test_run_with_location_and_uv_index(self, mock_requests_get, mock_env_get, mock_load_dotenv):
         """Test successful forecast fetch with UV index for a location."""
+        
         mock_env_get.return_value = "fake_api_key"
         
         # Mock geo response for coordinates
@@ -281,6 +282,7 @@ class TestActionFetchWeatherForecast(unittest.TestCase):
     @patch('actions.actions.requests.get')
     def test_run_with_location_without_uv_data(self, mock_requests_get, mock_env_get, mock_load_dotenv):
         """Test forecast fetch when UV data is unavailable."""
+        
         mock_env_get.return_value = "fake_api_key"
         
         # Mock geo response for coordinates

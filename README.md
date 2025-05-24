@@ -6,6 +6,7 @@ A Rasa-powered chatbot that provides weather information and forecasts using the
 
 - Get current weather for any location
 - Get weather forecasts for up to 3 days
+- Get UV index information and safety recommendations
 - Compare weather conditions
 - Get random interesting facts
 

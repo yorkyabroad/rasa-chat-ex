@@ -136,7 +136,7 @@ ENV/
 env.bak/
 venv.bak/
 datae.env
-.env.example
+#.env.example
 
 # Spyder project settings
 .spyderproject

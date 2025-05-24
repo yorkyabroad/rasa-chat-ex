@@ -248,10 +248,46 @@ class ActionFetchWeatherForecast(Action):
                 current_date = None
                 day_count = 0
                 
+                # Get today's date to ensure we include it
+                today = datetime.datetime.now().date()
+                
+                # First add today's forecast if available
+                today_forecasts = [f for f in data["list"] if 
+                                  datetime.datetime.fromtimestamp(f["dt"]).date() == today]
+                
+                if today_forecasts and day_count < days:
+                    day_count += 1
+                    current_date = today
+                    date_str = today.strftime("%A, %B %d") + " (Today)"
+                    
+                    # Find forecast closest to noon for today
+                    noon_forecasts = [f for f in today_forecasts if 
+                                     datetime.datetime.fromtimestamp(f["dt"]).hour >= 11 and
+                                     datetime.datetime.fromtimestamp(f["dt"]).hour <= 13]
+                    
+                    day_forecast = noon_forecasts[0] if noon_forecasts else today_forecasts[0]
+                    temp = day_forecast["main"]["temp"]
+                    weather = day_forecast["weather"][0]["description"]
+                    
+                    # Add UV index if available
+                    uv_info = ""
+                    if today in uv_data:
+                        uv_value = uv_data[today]
+                        uv_level = self._get_uv_level(uv_value)
+                        uv_info = f", UV index: {uv_value:.1f} ({uv_level})"
+                    
+                    forecast_message += f"\n• {date_str}: {weather}, temperature around {temp}°C{uv_info}"
+                    logger.debug(f"Added forecast for {date_str}: {weather}, {temp}°C{uv_info}")
+                
+                # Then process the rest of the days
                 for item in data["list"]:
                     forecast_date = datetime.datetime.fromtimestamp(item["dt"]).date()
                     
+                    # Simple comparison - just check if dates are different
                     if forecast_date != current_date:
+                        # Skip dates we've already processed
+                        if day_count >= days:
+                            break
                         if day_count >= days:
                             break
                         

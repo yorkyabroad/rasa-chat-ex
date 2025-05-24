@@ -31,13 +31,14 @@ Fetches weather forecast for a specified location.
   - Date
   - Weather description
   - Temperature in Celsius
+  - UV index with risk level (Low, Moderate, High, Very High, Extreme)
 
 **Example Response:**
 ```
 Weather forecast for London for the next 3 day(s):
-• Monday, June 1: partly cloudy, temperature around 19°C
-• Tuesday, June 2: sunny, temperature around 22°C
-• Wednesday, June 3: light rain, temperature around 17°C
+• Monday, June 1: partly cloudy, temperature around 19°C, UV index: 4.2 (Moderate)
+• Tuesday, June 2: sunny, temperature around 22°C, UV index: 6.8 (High)
+• Wednesday, June 3: light rain, temperature around 17°C, UV index: 3.5 (Moderate)
 ```
 
 ### ActionRandomFact
@@ -53,6 +54,24 @@ Provides a random interesting fact.
 **Example Response:**
 ```
 Did you know honey never spoils?
+```
+
+### ActionGetUVIndex
+
+Fetches current UV index information for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch UV index for
+
+**Returns:**
+- Current UV index value
+- UV risk level (Low, Moderate, High, Very High, Extreme)
+- Protection recommendations based on UV level
+
+**Example Response:**
+```
+The current UV index in Miami is 7.5 (High).
+Wear sunscreen SPF 30+, protective clothing, a hat, and sunglasses. Reduce time in the sun between 10 AM and 4 PM.
 ```
 
 ### ActionCompareWeather

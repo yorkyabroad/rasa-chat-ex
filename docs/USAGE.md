@@ -66,11 +66,17 @@ Bot: *Provides precipitation forecast for Toronto on Friday*
 User: "How's the humidity in Tokyo?"
 Bot: *Provides humidity information for Tokyo*
 
+User: "What's the UV index in Miami today?"
+Bot: *Provides UV index information with safety recommendations for Miami*
+
 User: "What's the wind speed in Chicago today?"
 Bot: *Provides wind speed information for Chicago*
 
 User: "How hot will it get in Dubai tomorrow?"
 Bot: *Provides temperature forecast for Dubai*
+
+User: "Do I need sunscreen in Los Angeles today?"
+Bot: *Provides UV index information with protection advice for Los Angeles*
 
 ### 4. Time-Based Weather Queries
 
