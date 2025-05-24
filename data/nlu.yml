@@ -162,3 +162,14 @@ nlu:
     - I want to know a random fact
     - Do you have a random fact?
     - Do you have any random facts?
+
+- intent: ask_uv_index
+  examples: |
+    - What is the UV index in [London](location)?
+    - Tell me the UV index in [New York](location)
+    - How much UV radiation is in [Tokyo](location)?
+    - What's the UV level in [Paris](location)?
+    - Current UV index in [Berlin](location)
+    - Is it UV in [Sydney](location)?
+    - UV index for [Moscow](location), please
+

@@ -64,3 +64,8 @@ rules:
   steps:
   - intent: ask_humidity
   - action: action_get_humidity
+
+- rule: Get UV index when asked
+  steps:
+  - intent: ask_uv_index
+  - action: action_get_uv_index

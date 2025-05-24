@@ -208,9 +208,37 @@ class ActionFetchWeatherForecast(Action):
             return []
         
         try:    
+            # Get coordinates first for UV index
+            geo_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}"
+            geo_response = requests.get(geo_url, timeout=10)
+            
+            if geo_response.status_code != 200:
+                logger.error(f"Failed to fetch location data: HTTP {geo_response.status_code}")
+                dispatcher.utter_message(text="I couldn't find that location. Please try again.")
+                return []
+                
+            geo_data = geo_response.json()
+            lat = geo_data["coord"]["lat"]
+            lon = geo_data["coord"]["lon"]
+            
+            # Get forecast data
             url = f"http://api.openweathermap.org/data/2.5/forecast?q={location}&appid={api_key}&units=metric"
             logger.info(f"Fetching {days}-day forecast for location: {location}")
             response = requests.get(url, timeout=10)
+            
+            # Get UV index data
+            uv_url = f"http://api.openweathermap.org/data/2.5/uvi/forecast?lat={lat}&lon={lon}&appid={api_key}&cnt={days}"
+            uv_response = requests.get(uv_url, timeout=10)
+            uv_data = {}
+            
+            if uv_response.status_code == 200:
+                uv_list = uv_response.json()
+                for uv_item in uv_list:
+                    date = datetime.datetime.fromtimestamp(uv_item["date"]).date()
+                    uv_data[date] = uv_item["value"]
+                logger.info(f"Successfully retrieved UV index data for {location}")
+            else:
+                logger.warning(f"Failed to fetch UV data: HTTP {uv_response.status_code}")
             
             if response.status_code == 200:
                 data = response.json()
@@ -240,8 +268,16 @@ class ActionFetchWeatherForecast(Action):
                             day_forecast = noon_forecasts[0]
                             temp = day_forecast["main"]["temp"]
                             weather = day_forecast["weather"][0]["description"]
-                            forecast_message += f"\n• {date_str}: {weather}, temperature around {temp}°C"
-                            logger.debug(f"Added forecast for {date_str}: {weather}, {temp}°C")
+                            
+                            # Add UV index if available
+                            uv_info = ""
+                            if forecast_date in uv_data:
+                                uv_value = uv_data[forecast_date]
+                                uv_level = self._get_uv_level(uv_value)
+                                uv_info = f", UV index: {uv_value:.1f} ({uv_level})"
+                            
+                            forecast_message += f"\n• {date_str}: {weather}, temperature around {temp}°C{uv_info}"
+                            logger.debug(f"Added forecast for {date_str}: {weather}, {temp}°C{uv_info}")
                 
                 logger.info(f"Successfully generated {day_count}-day forecast for {location}")
                 dispatcher.utter_message(text=forecast_message)
@@ -253,6 +289,18 @@ class ActionFetchWeatherForecast(Action):
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather forecast data.")
         
         return []
+        
+    def _get_uv_level(self, uv_value):
+        if uv_value < 3:
+            return "Low"
+        elif uv_value < 6:
+            return "Moderate"
+        elif uv_value < 8:
+            return "High"
+        elif uv_value < 11:
+            return "Very High"
+        else:
+            return "Extreme"
 
 class ActionGetHumidity(Action):
     def name(self) -> Text:
@@ -291,3 +339,84 @@ class ActionGetHumidity(Action):
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the humidity data.")
         
         return []
+
+class ActionGetUVIndex(Action):
+    def name(self) -> Text:
+        return "action_get_uv_index"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        location = tracker.get_slot("location")
+        if not location:
+            dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
+            return []
+
+        load_dotenv()
+        api_key = os.environ.get("OPENWEATHER_API_KEY")
+        if not api_key:
+            dispatcher.utter_message(text="Weather service is currently unavailable.")
+            return []
+        
+        try:
+            # First get coordinates for the location
+            geo_url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}"
+            logger.info(f"Fetching coordinates for location: {location}")
+            geo_response = requests.get(geo_url, timeout=10)
+            
+            if geo_response.status_code != 200:
+                logger.error(f"Failed to fetch location data: HTTP {geo_response.status_code}")
+                dispatcher.utter_message(text="I couldn't find that location. Please try again.")
+                return []
+                
+            geo_data = geo_response.json()
+            lat = geo_data["coord"]["lat"]
+            lon = geo_data["coord"]["lon"]
+            
+            # Get current UV index
+            uv_url = f"http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={api_key}"
+            logger.info(f"Fetching UV index data for coordinates: {lat}, {lon}")
+            uv_response = requests.get(uv_url, timeout=10)
+            
+            if uv_response.status_code == 200:
+                uv_data = uv_response.json()
+                uv_value = uv_data["value"]
+                uv_level = self._get_uv_level(uv_value)
+                
+                protection_advice = self._get_protection_advice(uv_value)
+                
+                logger.info(f"Successfully retrieved UV index for {location}: {uv_value} ({uv_level})")
+                dispatcher.utter_message(
+                    text=f"The current UV index in {location} is {uv_value:.1f} ({uv_level}).\n{protection_advice}"
+                )
+            else:
+                logger.error(f"Failed to fetch UV data: HTTP {uv_response.status_code}")
+                dispatcher.utter_message(text="I couldn't fetch the UV index for that location. Try again.")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"UV index API request error for {location}: {str(e)}")
+            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the UV index data.")
+        
+        return []
+        
+    def _get_uv_level(self, uv_value):
+        if uv_value < 3:
+            return "Low"
+        elif uv_value < 6:
+            return "Moderate"
+        elif uv_value < 8:
+            return "High"
+        elif uv_value < 11:
+            return "Very High"
+        else:
+            return "Extreme"
+            
+    def _get_protection_advice(self, uv_value):
+        if uv_value < 3:
+            return "No protection required for most people."
+        elif uv_value < 6:
+            return "Wear sunscreen, a hat, and sunglasses. Seek shade during midday hours."
+        elif uv_value < 8:
+            return "Wear sunscreen SPF 30+, protective clothing, a hat, and sunglasses. Reduce time in the sun between 10 AM and 4 PM."
+        elif uv_value < 11:
+            return "Wear SPF 30+ sunscreen, protective clothing, a wide-brim hat, and UV-blocking sunglasses. Try to avoid sun exposure between 10 AM and 4 PM."
+        else:
+            return "Take all precautions: SPF 30+ sunscreen, protective clothing, wide-brim hat, and UV-blocking sunglasses. Avoid sun exposure as much as possible."
