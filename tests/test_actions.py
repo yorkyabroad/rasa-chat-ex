@@ -6,7 +6,8 @@ import datetime
 import requests
 from actions.actions import (
     ActionRandomFact, ActionCompareWeather, ActionFetchWeather, 
-    ActionFetchWeatherForecast, ActionGetLocalTime, ActionGetHumidity
+    ActionFetchWeatherForecast, ActionGetLocalTime, ActionGetHumidity,
+    ActionGetUVIndex
 )
 
 # Test data constants
@@ -32,6 +33,12 @@ WEATHER_RESPONSE = {
 TIMEZONE_RESPONSE = {
     "coord": {"lat": 51.5074, "lon": -0.1278},
     "timezone": 3600
+}
+
+UV_RESPONSE = {
+    "value": 5.2,
+    "date_iso": "2024-01-01T12:00:00Z",
+    "date": 1704110400
 }
 
 class TestActionRandomFact(unittest.TestCase):
@@ -213,11 +220,19 @@ class TestActionFetchWeatherForecast(unittest.TestCase):
     @patch('actions.actions.load_dotenv')
     @patch('actions.actions.os.environ.get')
     @patch('actions.actions.requests.get')
-    def test_run_with_location(self, mock_requests_get, mock_env_get, mock_load_dotenv):
-        """Test successful forecast fetch for a location."""
+    def test_run_with_location_and_uv_index(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test successful forecast fetch with UV index for a location."""
         mock_env_get.return_value = "fake_api_key"
-        mock_response = MagicMock(status_code=200)
-        mock_response.json.return_value = {
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 35.6895, "lon": 139.6917}
+        }
+        
+        # Mock forecast response
+        forecast_response = MagicMock(status_code=200)
+        forecast_response.json.return_value = {
             "list": [
                 {
                     "dt": 1704110400,  # 2024-01-01 12:00:00
@@ -233,19 +248,78 @@ class TestActionFetchWeatherForecast(unittest.TestCase):
                 }
             ]
         }
-        mock_requests_get.return_value = mock_response
+        
+        # Mock UV index response
+        uv_response = MagicMock(status_code=200)
+        uv_response.json.return_value = [
+            {
+                "date": 1704110400,  # 2024-01-01
+                "value": 6.5
+            }
+        ]
+        
+        # Set up the side effect to return different responses for different calls
+        mock_requests_get.side_effect = [geo_response, forecast_response, uv_response]
         
         self.tracker.get_slot.return_value = "Tokyo"
         self.action.run(self.dispatcher, self.tracker, self.domain)
         
-        mock_requests_get.assert_called_once()
-        self.assertIn("Tokyo", mock_requests_get.call_args[0][0])
+        # Check that all three API calls were made
+        self.assertEqual(mock_requests_get.call_count, 3)
         
+        # Check the message content
         message = self.dispatcher.utter_message.call_args[1]['text']
         self.assertIn("Tokyo", message)
         self.assertIn("22.5°C", message)
         self.assertIn("sunny", message)
         self.assertIn("January 01", message)
+        self.assertIn("UV index: 6.5", message)
+        self.assertIn("High", message)  # UV level
+        
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_location_without_uv_data(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test forecast fetch when UV data is unavailable."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 35.6895, "lon": 139.6917}
+        }
+        
+        # Mock forecast response
+        forecast_response = MagicMock(status_code=200)
+        forecast_response.json.return_value = {
+            "list": [
+                {
+                    "dt": 1704110400,  # 2024-01-01 12:00:00
+                    "dt_txt": "2024-01-01 12:00:00",
+                    "main": {"temp": 22.5},
+                    "weather": [{"description": "sunny"}]
+                }
+            ]
+        }
+        
+        # Mock UV index response with error
+        uv_response = MagicMock(status_code=404)
+        
+        # Set up the side effect to return different responses for different calls
+        mock_requests_get.side_effect = [geo_response, forecast_response, uv_response]
+        
+        self.tracker.get_slot.return_value = "Tokyo"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check that all three API calls were made
+        self.assertEqual(mock_requests_get.call_count, 3)
+        
+        # Check the message content - should have forecast but no UV index
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("Tokyo", message)
+        self.assertIn("22.5°C", message)
+        self.assertIn("sunny", message)
+        self.assertNotIn("UV index", message)
 
     @patch('actions.actions.load_dotenv')
     @patch('actions.actions.os.environ.get')
@@ -329,6 +403,108 @@ class TestActionGetHumidity(unittest.TestCase):
         """Test handling of API errors."""
         mock_requests_get.side_effect = requests.exceptions.RequestException()
         self.tracker.get_slot.return_value = "Berlin"
+        
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        self.dispatcher.utter_message.assert_called_once()
+        self.assertIn("sorry", self.dispatcher.utter_message.call_args[1]['text'].lower())
+
+
+class TestActionGetUVIndex(unittest.TestCase):
+    """Tests for UV index fetching action."""
+
+    def setUp(self):
+        self.dispatcher = MagicMock()
+        self.tracker = MagicMock()
+        self.domain = MagicMock()
+        self.action = ActionGetUVIndex()
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_location(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test successful UV index fetch for a location."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 33.44, "lon": -94.04}
+        }
+        
+        # Mock UV index response
+        uv_response = MagicMock(status_code=200)
+        uv_response.json.return_value = {
+            "value": 7.5
+        }
+        
+        # Set up the side effect to return different responses for different calls
+        mock_requests_get.side_effect = [geo_response, uv_response]
+        
+        self.tracker.get_slot.return_value = "Miami"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check that both API calls were made
+        self.assertEqual(mock_requests_get.call_count, 2)
+        
+        # Check the message content
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("Miami", message)
+        self.assertIn("7.5", message)
+        self.assertIn("High", message)  # UV level
+        self.assertIn("Reduce time in the sun", message)  # Protection advice
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_uv_level_categorization(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test UV index level categorization."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Test different UV levels
+        uv_test_cases = [
+            {"value": 2.0, "expected_level": "Low", "expected_advice": "No protection required"},
+            {"value": 4.5, "expected_level": "Moderate", "expected_advice": "Wear sunscreen"},
+            {"value": 7.0, "expected_level": "High", "expected_advice": "SPF 30+"},
+            {"value": 9.5, "expected_level": "Very High", "expected_advice": "avoid sun exposure"},
+            {"value": 11.5, "expected_level": "Extreme", "expected_advice": "Take all precautions"}
+        ]
+        
+        for test_case in uv_test_cases:
+            # Reset mocks
+            mock_requests_get.reset_mock()
+            self.dispatcher.reset_mock()
+            
+            # Mock geo response for coordinates
+            geo_response = MagicMock(status_code=200)
+            geo_response.json.return_value = {
+                "coord": {"lat": 33.44, "lon": -94.04}
+            }
+            
+            # Mock UV index response with test value
+            uv_response = MagicMock(status_code=200)
+            uv_response.json.return_value = {
+                "value": test_case["value"]
+            }
+            
+            # Set up the side effect
+            mock_requests_get.side_effect = [geo_response, uv_response]
+            
+            self.tracker.get_slot.return_value = "TestCity"
+            self.action.run(self.dispatcher, self.tracker, self.domain)
+            
+            # Check the message content for expected level and advice
+            message = self.dispatcher.utter_message.call_args[1]['text']
+            self.assertIn(f"{test_case['value']:.1f}", message)
+            self.assertIn(test_case["expected_level"], message)
+            self.assertIn(test_case["expected_advice"], message)
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_api_error(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of API errors."""
+        mock_requests_get.side_effect = requests.exceptions.RequestException()
+        self.tracker.get_slot.return_value = "Miami"
         
         self.action.run(self.dispatcher, self.tracker, self.domain)
         self.dispatcher.utter_message.assert_called_once()
