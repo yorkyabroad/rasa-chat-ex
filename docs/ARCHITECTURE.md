@@ -59,6 +59,10 @@ User Input → NLU → Dialogue Management → Action Execution → Response Gen
 - **Weather API**: Provides real-time weather data
   - Connection managed through `actions/weather_utils.py`
   - Configured via environment variables
+  - Endpoints used:
+    - Current weather data
+    - Weather forecast
+    - UV index data
 
 ### Deployment Architecture
 

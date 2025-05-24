@@ -94,6 +94,10 @@ nlu:
   examples: |
     - What's the weather in [New York](location)?
     - Tell me the weather in [Los Angeles](location).
+    - Tell me about the weather in [London](location).
+    - Tell me about the weather in [London](location) today.
+    - Tell me about the weather in [London](location) for today.
+    - How's the weather in [Vienna](location) today?
     - How's the weather in [London](location)?
     - What's the weather like in [Tokyo](location)?
     - Weather forecast for [Chicago](location), please.
