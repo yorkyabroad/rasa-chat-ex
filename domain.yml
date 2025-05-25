@@ -17,6 +17,7 @@ intents:
   - random_fact  # Add this intent
   - ask_humidity  # Intent for asking about humidity in a location
   - ask_uv_index  # Intent for asking about UV index in a location
+  - ask_uv_index_forecast  # Intent for asking about future UV index
 #  - ask_local_time  # Add this intent
 #  - ask_date  # Add this intent
 #  - ask_location  # Add this intent
@@ -37,6 +38,7 @@ actions:
   - action_confirmation
   - action_get_humidity  # Action for retrieving humidity data from OpenWeather API
   - action_get_uv_index  # Action for retrieving UV index data from OpenWeather API
+  - action_get_uv_index_forecast  # Action for retrieving UV index forecast
 
 entities:
   - number_of_people

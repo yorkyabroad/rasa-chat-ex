@@ -93,9 +93,11 @@ nlu:
 - intent: ask_weather
   examples: |
     - What's the weather in [New York](location)?
+    - What is the weather for [London](location) today?
     - Tell me the weather in [Los Angeles](location).
     - Tell me about the weather in [London](location).
     - Tell me about the weather in [London](location) today.
+    - Tell me about the weather for [London](location) today.
     - Tell me about the weather in [London](location) for today.
     - How's the weather in [Vienna](location) today?
     - How's the weather in [London](location)?
@@ -110,15 +112,6 @@ nlu:
     - How's the time in [London](location)?
     - What's the time like in [Tokyo](location)?
     - Time for [Chicago](location), please.
-
-#- intent: ask_date
-#  examples: |
-#    - What's the date in [New York](location)?
-#    - What date is it in [Dublin](location)?
-#    - Tell me the date in [Los Angeles](location).
-#    - How's the date in [London](location)?
-#    - What's the date like in [Tokyo](location)?
-#    - Date for [Chicago](location), please.
 
 #- intent: ask_date
 #  examples: |
@@ -170,10 +163,25 @@ nlu:
 - intent: ask_uv_index
   examples: |
     - What is the UV index in [London](location)?
+    - What's the UV index for [London](location) today?
     - Tell me the UV index in [New York](location)
     - How much UV radiation is in [Tokyo](location)?
     - What's the UV level in [Paris](location)?
     - Current UV index in [Berlin](location)
     - Is it UV in [Sydney](location)?
     - UV index for [Moscow](location), please
+
+- intent: ask_uv_index_forecast
+  examples: |
+    - What will the UV index be in [London](location) tomorrow?
+    - What's the UV forecast for [New York](location)?
+    - What's the UV index for [New York](location) tomorrow?
+    - How will the UV index be in [Tokyo](location) tomorrow?
+    - Will I need sunscreen in [Paris](location) tomorrow?
+    - UV index forecast for [Berlin](location)
+    - What will the UV level be like in [Sydney](location) tomorrow?
+    - Will the UV be high in [Moscow](location) tomorrow?
+    - Do I need to worry about UV in [Barcelona](location) tomorrow?
+    - UV radiation forecast for [Miami](location)
+    - Will it be sunny and high UV in [Los Angeles](location) tomorrow?
 
