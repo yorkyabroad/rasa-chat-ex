@@ -169,6 +169,33 @@ class TestActionFetchWeather(unittest.TestCase):
         self.dispatcher.utter_message.assert_called_once_with(
             text="I couldn't find the location. Could you please provide it?"
         )
+        
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    def test_run_without_api_key(self, mock_env_get, mock_load_dotenv):
+        """Test handling of missing API key."""
+        mock_env_get.return_value = None
+        self.tracker.get_slot.return_value = "Paris"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        self.dispatcher.utter_message.assert_called_once_with(
+            text="Weather service is currently unavailable."
+        )
+        
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_api_error_status(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of API error status."""
+        mock_env_get.return_value = "fake_api_key"
+        mock_response = MagicMock(status_code=404)
+        mock_requests_get.return_value = mock_response
+        
+        self.tracker.get_slot.return_value = "NonExistentCity"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        self.dispatcher.utter_message.assert_called_once()
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("couldn't fetch the weather", message.lower())
 
 class TestActionGetLocalTime(unittest.TestCase):
     """Tests for local time fetching action."""
@@ -214,6 +241,32 @@ class TestActionGetLocalTime(unittest.TestCase):
     @patch('actions.actions.load_dotenv')
     @patch('actions.actions.os.environ.get')
     @patch('actions.actions.requests.get')
+    @patch('actions.actions.datetime')
+    def test_timezone_api_fallback(self, mock_datetime, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test fallback to timezone offset when timezone API is not available."""
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime(2023, 6, 15, 12, 0, 0)
+        
+        # Return weather API key but not timezone API key
+        mock_env_get.side_effect = lambda name: "fake_key" if name == "OPENWEATHER_API_KEY" else None
+        
+        # Mock successful weather response
+        weather_response = MagicMock(status_code=200)
+        weather_response.json.return_value = TIMEZONE_RESPONSE
+        
+        mock_requests_get.return_value = weather_response
+        self.tracker.get_slot.return_value = "London"
+        
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Should fall back to using timezone offset
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("London", message)
+        self.assertIn("approximately", message)
+        self.assertIn("based on timezone offset", message)
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
     def test_api_error(self, mock_requests_get, mock_env_get, mock_load_dotenv):
         """Test handling of API errors."""
         mock_requests_get.side_effect = requests.exceptions.RequestException()
@@ -222,6 +275,33 @@ class TestActionGetLocalTime(unittest.TestCase):
         self.action.run(self.dispatcher, self.tracker, self.domain)
         self.dispatcher.utter_message.assert_called_once()
         self.assertIn("sorry", self.dispatcher.utter_message.call_args[1]['text'].lower())
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    @patch('actions.actions.datetime')
+    def test_timezone_api_error(self, mock_datetime, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of timezone API errors."""
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime(2023, 6, 15, 12, 0, 0)
+        
+        # Return weather API key but not timezone API key
+        mock_env_get.side_effect = lambda name: "fake_key" if name == "OPENWEATHER_API_KEY" else None
+        
+        # Mock successful weather response but failed timezone response
+        weather_response = MagicMock(status_code=200)
+        weather_response.json.return_value = TIMEZONE_RESPONSE
+        
+        mock_requests_get.return_value = weather_response
+        self.tracker.get_slot.return_value = "London"
+        
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Should fall back to using timezone offset
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("London", message)
+        self.assertIn("approximately", message)
+        self.assertIn("based on timezone offset", message)
+
 
 class TestActionFetchWeatherForecast(unittest.TestCase):
     """Tests for weather forecast fetching action."""
@@ -371,6 +451,47 @@ class TestActionFetchWeatherForecast(unittest.TestCase):
         self.dispatcher.utter_message.assert_called_once()
         self.assertIn("sorry", self.dispatcher.utter_message.call_args[1]['text'].lower())
 
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_run_with_invalid_days(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of invalid days parameter."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 35.6895, "lon": 139.6917}
+        }
+        
+        # Mock forecast response
+        forecast_response = MagicMock(status_code=200)
+        forecast_response.json.return_value = {
+            "list": [
+                {
+                    "dt": 1704110400,  # 2024-01-01 12:00:00
+                    "main": {"temp": 22.5},
+                    "weather": [{"description": "sunny"}]
+                }
+            ]
+        }
+        
+        # Mock UV index response
+        uv_response = MagicMock(status_code=200)
+        uv_response.json.return_value = []
+        
+        # Set up the side effect to return different responses for different calls
+        mock_requests_get.side_effect = [geo_response, forecast_response, uv_response]
+        
+        # Set up invalid days value
+        self.tracker.get_slot.side_effect = lambda name: "Tokyo" if name == "location" else "invalid" if name == "days" else None
+        
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check that the message contains "3 day(s)" since invalid days should default to 3
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("3 day(s)", message)
+
 
 class TestActionGetHumidity(unittest.TestCase):
     """Tests for humidity fetching action."""
@@ -469,6 +590,32 @@ class TestActionGetUVIndex(unittest.TestCase):
         self.assertIn("7.5", message)
         self.assertIn("High", message)  # UV level
         self.assertIn("Reduce time in the sun", message)  # Protection advice
+        
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_uv_api_error_status(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of UV API error status."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 33.44, "lon": -94.04}
+        }
+        
+        # Mock UV index response with error status
+        uv_response = MagicMock(status_code=404)
+        
+        # Set up the side effect
+        mock_requests_get.side_effect = [geo_response, uv_response]
+        
+        self.tracker.get_slot.return_value = "Miami"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check error message
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("couldn't fetch the UV index", message.lower())
 
     @patch('actions.actions.load_dotenv')
     @patch('actions.actions.os.environ.get')
@@ -526,6 +673,34 @@ class TestActionGetUVIndex(unittest.TestCase):
         self.action.run(self.dispatcher, self.tracker, self.domain)
         self.dispatcher.utter_message.assert_called_once()
         self.assertIn("sorry", self.dispatcher.utter_message.call_args[1]['text'].lower())
+
+    @patch('actions.actions.load_dotenv')
+    @patch('actions.actions.os.environ.get')
+    @patch('actions.actions.requests.get')
+    def test_uv_api_error_status(self, mock_requests_get, mock_env_get, mock_load_dotenv):
+        """Test handling of UV API error status."""
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response for coordinates
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 33.44, "lon": -94.04}
+        }
+        
+        # Mock UV index response with error status
+        uv_response = MagicMock(status_code=404)
+        
+        # Set up the side effect
+        mock_requests_get.side_effect = [geo_response, uv_response]
+        
+        self.tracker.get_slot.return_value = "Miami"
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check error message
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        self.assertIn("couldn't fetch the UV index", message)
+        
+
 
 
 class TestActionGetUVIndexForecast(unittest.TestCase):
