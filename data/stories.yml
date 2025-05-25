@@ -64,6 +64,14 @@ stories:
   steps:
     - intent: ask_uv_index
       entities:
-        - location: "Olso"
+        - location: "Oslo"
         - location: "Moscow"
     - action: action_get_uv_index
+
+- story: uv index forecast query
+  steps:
+    - intent: ask_uv_index_forecast
+      entities:
+        - location: "Miami"
+        - location: "Barcelona"
+    - action: action_get_uv_index_forecast
