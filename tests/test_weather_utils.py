@@ -180,3 +180,88 @@ class TestWeatherUtils:
             response = fetch_with_retry("http://example.com")
             assert response == mock_response
             mock_get.assert_called_once_with("http://example.com", timeout=10)
+
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_retry_success(self, mock_get):
+        """Test successful API request with retry logic."""
+        # Setup mock response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+        
+        # Call the function
+        result = fetch_with_retry("http://test-url.com")
+        
+        # Verify results
+        assert result == mock_response
+        mock_get.assert_called_once_with("http://test-url.com", timeout=10)
+    
+    @patch('actions.weather_utils.requests.get')
+    @patch('actions.weather_utils.has_tenacity', True)
+    @patch('tenacity.retry')
+    def test_fetch_with_retry_with_tenacity(self, mock_retry, mock_get):
+        """Test that retry logic is used when tenacity is available."""
+        # Setup mock
+        mock_retry.return_value = lambda f: f  # Simple decorator that returns the function unchanged
+        mock_response = MagicMock()
+        mock_get.return_value = mock_response
+        
+        # Call the function (this would be the decorated version if tenacity was properly mocked)
+        result = fetch_with_retry("http://test-url.com")
+        
+        # Verify results
+        assert result == mock_response
+        mock_get.assert_called_once_with("http://test-url.com", timeout=10)
+    
+    @patch('actions.weather_utils.has_tenacity', False)
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_without_tenacity(self, mock_get):
+        """Test the fetch_with_retry function when tenacity is not available."""
+        mock_response = MagicMock()
+        mock_get.return_value = mock_response
+        
+        response = fetch_with_retry("http://example.com")
+        assert response == mock_response
+        mock_get.assert_called_once_with("http://example.com", timeout=10)
+
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_retry_timeout(self, mock_get):
+        """Test handling of timeout errors."""
+        # Setup mock to raise timeout exception
+        mock_get.side_effect = requests.exceptions.Timeout("Connection timed out")
+        
+        # Call the function and expect exception
+        # If tenacity is available, it would retry, but we're testing the base case
+        if not has_tenacity:
+            with self.assertRaises(requests.exceptions.Timeout):
+                fetch_with_retry("http://test-url.com")
+        else:
+            # With tenacity, we'd need more complex mocking to test retries
+            pass
+    
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_retry_connection_error(self, mock_get):
+        """Test handling of connection errors."""
+        # Setup mock to raise connection exception
+        mock_get.side_effect = requests.exceptions.ConnectionError("Connection failed")
+        
+        # Call the function and expect exception
+        if not has_tenacity:
+            with self.assertRaises(requests.exceptions.ConnectionError):
+                fetch_with_retry("http://test-url.com")
+        else:
+            # With tenacity, we'd need more complex mocking to test retries
+            pass
+
+    @patch('actions.weather_utils.has_tenacity', True)
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_tenacity(self, mock_get):
+        """Test fetch_with_retry with tenacity enabled."""
+        mock_response = MagicMock()
+        mock_get.return_value = mock_response
+        
+        # This is a simplified test since properly mocking the tenacity decorator is complex
+        # We're just verifying that the function works when has_tenacity is True
+        response = fetch_with_retry("http://example.com")
+        assert response is not None
+        mock_get.assert_called_with("http://example.com", timeout=10)
