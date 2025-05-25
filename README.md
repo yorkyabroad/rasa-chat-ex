@@ -7,7 +7,10 @@ A Rasa-powered chatbot that provides weather information and forecasts using the
 - Get current weather for any location
 - Get weather forecasts for up to 3 days
 - Get UV index information and safety recommendations
-- Compare weather conditions
+- Get UV index forecasts for future days
+- Compare weather conditions with historical averages
+- Get humidity information
+- Get local time for any location
 - Get random interesting facts
 
 ## Prerequisites

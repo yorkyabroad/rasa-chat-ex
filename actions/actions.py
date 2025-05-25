@@ -10,6 +10,10 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from dotenv import load_dotenv
+from .weather_utils import (
+    WeatherService, WeatherAPIError, get_coordinates, 
+    get_uv_level, get_protection_advice
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,32 +29,32 @@ class ActionFetchWeather(Action):
             return []
 
         load_dotenv()
-        api_key = os.environ.get("OPENWEATHER_API_KEY")
+        api_key = os.environ.get("OPENWEATHER_API_KEY", "")
         if not api_key:
             dispatcher.utter_message(text="Weather service is currently unavailable.")
             return []
         
-        try:    
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
-            logger.info(f"Fetching weather data for location: {location}")
-            response = requests.get(url, timeout=10)
+        try:
+            weather_service = WeatherService(api_key)
+            data = weather_service.get_current_weather(location)
             
-            if response.status_code == 200:
-                data = response.json()
-                temperature = data["main"]["temp"]
-                weather = data["weather"][0]["description"]
-                logger.info(f"Successfully retrieved weather for {location}: {weather}, {temperature}°C")
-                dispatcher.utter_message(
-                    text=f"The current weather in {location} is {weather} with a temperature of {temperature}°C."
-                )
-            else:
-                logger.error(f"Failed to fetch weather data: HTTP {response.status_code} for location {location}")
-                dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Weather API request error for {location}: {str(e)}")
+            temperature = data["main"]["temp"]
+            weather = data["weather"][0]["description"]
+            logger.info(f"Successfully retrieved weather for {location}: {weather}, {temperature}°C")
+            
+            dispatcher.utter_message(
+                text=f"The current weather in {location} is {weather} with a temperature of {temperature}°C."
+            )
+        except WeatherAPIError as e:
+            logger.error(f"Weather API error for {location}: {str(e)}")
+            dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
+        except Exception as e:
+            logger.error(f"Error fetching weather for {location}: {str(e)}")
             dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather data.")
         
         return []
+    
+
 
 class ActionRandomFact(Action):
     def name(self) -> Text:
@@ -388,7 +392,7 @@ class ActionGetUVIndex(Action):
             return []
 
         load_dotenv()
-        api_key = os.environ.get("OPENWEATHER_API_KEY")
+        api_key = os.environ.get("OPENWEATHER_API_KEY", "")
         if not api_key:
             dispatcher.utter_message(text="Weather service is currently unavailable.")
             return []
@@ -456,3 +460,5 @@ class ActionGetUVIndex(Action):
             return "Wear SPF 30+ sunscreen, protective clothing, a wide-brim hat, and UV-blocking sunglasses. Try to avoid sun exposure between 10 AM and 4 PM."
         else:
             return "Take all precautions: SPF 30+ sunscreen, protective clothing, wide-brim hat, and UV-blocking sunglasses. Avoid sun exposure as much as possible."
+
+

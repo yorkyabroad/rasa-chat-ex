@@ -29,7 +29,7 @@ The dialogue management system:
 - `data/rules.yml`: Specific conversation rules
 - `domain.yml`: Defines the universe of the bot
 
-### 3. Custom Actions
+### 3. Custom Actions and Utilities
 
 Custom actions extend the bot's capabilities by:
 - Connecting to external APIs (weather service)
@@ -38,7 +38,14 @@ Custom actions extend the bot's capabilities by:
 
 **Key files:**
 - `actions/actions.py`: Implementation of custom actions
-- `actions/weather_utils.py`: Weather API integration utilities
+- `actions/weather_utils.py`: Weather API integration utilities and helper functions
+
+The weather utilities module provides:
+- API endpoint configuration
+- Retry logic for API calls
+- Structured data classes for responses
+- Helper functions for UV index interpretation
+- Error handling and logging
 
 ## Data Flow
 
@@ -62,7 +69,9 @@ User Input → NLU → Dialogue Management → Action Execution → Response Gen
   - Endpoints used:
     - Current weather data
     - Weather forecast
-    - UV index data
+    - Current UV index data
+    - UV index forecast data
+    - Geolocation data
 
 ### Deployment Architecture
 
