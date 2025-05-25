@@ -74,6 +74,25 @@ The current UV index in Miami is 7.5 (High).
 Wear sunscreen SPF 30+, protective clothing, a hat, and sunglasses. Reduce time in the sun between 10 AM and 4 PM.
 ```
 
+### ActionGetUVIndexForecast
+
+Fetches UV index forecast for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch UV forecast for
+- `days` (optional): Number of days ahead to forecast (1-5, default: 1)
+
+**Returns:**
+- Forecast UV index value
+- UV risk level (Low, Moderate, High, Very High, Extreme)
+- Protection recommendations based on UV level
+
+**Example Response:**
+```
+The UV index in Miami tomorrow (Tuesday, July 11) is forecast to be 9.5 (Very High).
+Wear SPF 30+ sunscreen, protective clothing, a wide-brim hat, and UV-blocking sunglasses. Try to avoid sun exposure between 10 AM and 4 PM.
+```
+
 ### ActionCompareWeather
 
 Compares current weather with historical or forecast data.

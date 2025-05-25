@@ -78,6 +78,20 @@ Bot: *Provides temperature forecast for Dubai*
 User: "Do I need sunscreen in Los Angeles today?"
 Bot: *Provides UV index information with protection advice for Los Angeles*
 
+### 3.1 UV Index Information
+
+User: "What's the UV index in Miami today?"
+Bot: *Provides current UV index with protection recommendations*
+
+User: "Will I need sunscreen in Barcelona tomorrow?"
+Bot: *Provides UV index forecast with protection advice*
+
+User: "What will the UV index be like in Sydney this weekend?"
+Bot: *Provides UV index forecast for the weekend*
+
+User: "Is the UV index dangerous in Phoenix today?"
+Bot: *Provides UV risk level assessment and safety recommendations*
+
 ### 4. Time-Based Weather Queries
 
 User: "What's the weather like in London at 3pm?"
