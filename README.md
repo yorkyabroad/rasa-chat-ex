@@ -8,6 +8,8 @@ A Rasa-powered chatbot that provides weather information and forecasts using the
 - Get weather forecasts for up to 3 days
 - Get UV index information and safety recommendations
 - Get UV index forecasts for future days
+- Get air pollution data and health recommendations
+- Get air pollution forecasts for tomorrow
 - Compare weather conditions with historical averages
 - Get humidity information
 - Get local time for any location

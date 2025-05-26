@@ -71,6 +71,8 @@ User Input → NLU → Dialogue Management → Action Execution → Response Gen
     - Weather forecast
     - Current UV index data
     - UV index forecast data
+    - Air pollution data
+    - Air pollution forecast data
     - Geolocation data
 
 ### Deployment Architecture

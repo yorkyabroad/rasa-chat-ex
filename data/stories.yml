@@ -29,14 +29,6 @@ stories:
   - intent: deny
   - action: utter_goodbye
 
-#- story: book table flow
-#  steps:
-#    - intent: book_table
-#    - action: restaurant_form
-#    - active_loop: restaurant_form
-#    - active_loop: null
-#    - action: utter_confirmation
-
 - story: weather query
   steps:
     - intent: ask_weather
@@ -53,8 +45,6 @@ stories:
 - story: humidity query
   steps:
     - intent: ask_humidity
-#    - action: utter_ask_location
-#    - intent: inform
       entities:
         - location: "Paris"
         - location: "Dublin"
@@ -75,3 +65,17 @@ stories:
         - location: "Miami"
         - location: "Barcelona"
     - action: action_get_uv_index_forecast
+
+- story: User asks about air pollution today
+  steps:
+  - intent: ask_air_pollution
+    entities:
+    - location: "London"
+  - action: action_get_air_pollution
+
+- story: User asks about air pollution tomorrow
+  steps:
+  - intent: ask_air_pollution_forecast
+    entities:
+    - location: "Paris"
+  - action: action_get_air_pollution_forecast

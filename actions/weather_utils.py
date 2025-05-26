@@ -10,7 +10,13 @@ import os
 import sys
 import requests
 import logging
-import tenacity
+
+# Try to import tenacity, but make it optional
+try:
+    import tenacity
+    has_tenacity = True
+except ImportError:
+    has_tenacity = False
 from dataclasses import dataclass  # noqa: E402 - Ignore 'from' in import statements
 from typing import Dict, Any, Optional, Tuple, List  # noqa: E402 - Ignore 'from' in import statements
 from dotenv import load_dotenv  # noqa: E402 - Ignore 'from' in import statements
@@ -18,14 +24,13 @@ from dotenv import load_dotenv  # noqa: E402 - Ignore 'from' in import statement
 # Configure logger
 logger = logging.getLogger(__name__)
 
-# Check if tenacity is available
-has_tenacity = hasattr(tenacity, 'retry')
+# Log warning if tenacity is not available
 if not has_tenacity:
-    logger.warning("Tenacity module not properly installed, running without retry logic")
+    logger.warning("Tenacity module not available, running without retry logic")
 
 # Define fetch_with_retry function based on tenacity availability
 if has_tenacity:
-    # Use tenacity attributes directly
+    # Define with retry logic
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(3),
         wait=tenacity.wait_exponential(multiplier=1, min=2, max=10)
@@ -34,6 +39,7 @@ if has_tenacity:
         """Fetch data from URL with retry logic for transient failures."""
         return requests.get(url, timeout=10)
 else:
+    # Simple version without retry logic
     def fetch_with_retry(url: str) -> requests.Response:
         """Simple fetch without retry logic."""
         return requests.get(url, timeout=10)

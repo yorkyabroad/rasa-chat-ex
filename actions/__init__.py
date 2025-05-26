@@ -16,3 +16,5 @@ logger = logging.getLogger(__name__)
 # Skip environment validation for tests
 # The actual validation will happen in the main application
 logger.info("Initializing actions module")
+from actions.actions_air_pollution import ActionGetAirPollution
+from actions.actions_air_pollution_forecast import ActionGetAirPollutionForecast

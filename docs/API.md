@@ -93,6 +93,56 @@ The UV index in Miami tomorrow (Tuesday, July 11) is forecast to be 9.5 (Very Hi
 Wear SPF 30+ sunscreen, protective clothing, a wide-brim hat, and UV-blocking sunglasses. Try to avoid sun exposure between 10 AM and 4 PM.
 ```
 
+### ActionGetAirPollution
+
+Fetches current air pollution information for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch air quality for
+
+**Returns:**
+- Air Quality Index (AQI) value
+- AQI level (Good, Fair, Moderate, Poor, Very Poor)
+- Key pollutant measurements (PM2.5, PM10, NO₂, O₃)
+- Health implications based on AQI level
+
+**Example Response:**
+```
+The current air quality in London is Fair (AQI: 2).
+Key pollutants:
+• PM2.5: 4.5 μg/m³
+• PM10: 7.6 μg/m³
+• NO₂: 9.4 μg/m³
+• O₃: 68.7 μg/m³
+
+Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.
+```
+
+### ActionGetAirPollutionForecast
+
+Fetches air pollution forecast for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch air quality forecast for
+
+**Returns:**
+- Forecast Air Quality Index (AQI) value
+- AQI level (Good, Fair, Moderate, Poor, Very Poor)
+- Key pollutant measurements (PM2.5, PM10, NO₂, O₃)
+- Health implications based on AQI level
+
+**Example Response:**
+```
+The air quality forecast for London tomorrow (Wednesday, July 12) is Moderate (AQI: 3).
+Expected pollutant levels:
+• PM2.5: 8.5 μg/m³
+• PM10: 12.6 μg/m³
+• NO₂: 15.4 μg/m³
+• O₃: 85.7 μg/m³
+
+Members of sensitive groups may experience health effects. The general public is not likely to be affected.
+```
+
 ### ActionCompareWeather
 
 Compares current weather with historical or forecast data.

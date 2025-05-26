@@ -185,3 +185,31 @@ nlu:
     - UV radiation forecast for [Miami](location)
     - Will it be sunny and high UV in [Los Angeles](location) tomorrow?
 
+- intent: ask_air_pollution
+  examples: |
+    - What is the air pollution in [London](location)?
+    - What is the air pollution today in [New York](location)?
+    - Tell me about air quality in [Paris](location)
+    - How is the air quality in [Berlin](location)?
+    - Air pollution levels in [Sydney](location)
+    - Is the air clean in [Moscow](location)?
+    - Air quality index for [Beijing](location)
+    - What's the AQI in [Delhi](location)?
+    - How polluted is the air in [Los Angeles](location)?
+
+
+- intent: ask_air_pollution_forecast
+  examples: |
+    - What will the air pollution be in [London](location) tomorrow?
+    - What will the air pollution be tomorrow in [New York](location)?
+    - What will the air pollution be tomorrow in [Tokyo](location)?
+    - How will the air pollution be in [Paris](location) tomorrow?
+    - Will the air be polluted in [Berlin](location) tomorrow?
+    - Air pollution forecast for [Sydney](location) tomorrow
+    - Will the air be clean in [Moscow](location) tomorrow?
+    - Air quality forecast for [Beijing](location) tomorrow
+    - How will the air quality be in [Beijing](location) tomorrow
+    - What will the AQI be like in [Delhi](location) tomorrow?
+    - Will the air be polluted in [Los Angeles](location) tomorrow?
+    - Air pollution forecast for [Shanghai](location) tomorrow
+

@@ -92,6 +92,20 @@ Bot: *Provides UV index forecast for the weekend*
 User: "Is the UV index dangerous in Phoenix today?"
 Bot: *Provides UV risk level assessment and safety recommendations*
 
+### 3.2 Air Pollution Information
+
+User: "What is the air pollution in London?"
+Bot: *Provides current air quality index with health recommendations*
+
+User: "What's the air quality like in Beijing today?"
+Bot: *Provides current air pollution data with pollutant measurements*
+
+User: "What will the air pollution be tomorrow in Tokyo?"
+Bot: *Provides air pollution forecast for tomorrow*
+
+User: "Is the air quality dangerous in Delhi today?"
+Bot: *Provides air quality risk assessment and health implications*
+
 ### 4. Time-Based Weather Queries
 
 User: "What's the weather like in London at 3pm?"
