@@ -328,3 +328,143 @@ class TestActionAirPollutionForecast:
         assert "Everyone may begin to experience" in action._get_health_implications(4)
         assert "emergency conditions" in action._get_health_implications(5)
         assert "unknown" in action._get_health_implications(6)  # Invalid AQI
+
+    def setup_method(self):
+        """Set up test fixtures."""
+        self.dispatcher = MagicMock()
+        self.tracker = MagicMock()
+        self.domain = MagicMock()
+        self.action = ActionGetAirPollutionForecast()
+    
+    def test_name(self):
+        """Test the action name """
+        assert self.action.name() == "action_get_air_pollution_forecast"
+    
+    @patch('actions.actions_air_pollution_forecast.load_dotenv')
+    @patch('actions.actions_air_pollution_forecast.os.environ.get')
+    @patch('actions.actions_air_pollution_forecast.requests.get')
+    @patch('actions.actions_air_pollution_forecast.datetime')
+    def test_aqi_level_mapping(self, mock_datetime, mock_get, mock_env_get, mock_load_dotenv):
+        """Test AQI level mapping """
+        # Setup mocks
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock current date
+        today = datetime.datetime(2023, 7, 15)
+        tomorrow = datetime.datetime(2023, 7, 16)
+        mock_datetime.datetime.now.return_value = today
+        mock_datetime.datetime.fromtimestamp.side_effect = lambda ts: datetime.datetime.fromtimestamp(ts)
+        mock_datetime.timedelta.side_effect = datetime.timedelta
+        
+        # Mock geo response
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 51.5074, "lon": -0.1278}
+        }
+        
+        # Test different AQI levels
+        aqi_test_cases = [
+            {"aqi": 1, "expected_level": "Good", "expected_desc": "Air quality is considered satisfactory"},
+            {"aqi": 2, "expected_level": "Fair", "expected_desc": "Air quality is acceptable"},
+            {"aqi": 3, "expected_level": "Moderate", "expected_desc": "Members of sensitive groups may experience health effects"},
+            {"aqi": 4, "expected_level": "Poor", "expected_desc": "Everyone may begin to experience health effects"},
+            {"aqi": 5, "expected_level": "Very Poor", "expected_desc": "Health warnings of emergency conditions"}
+        ]
+        
+        for test_case in aqi_test_cases:
+            # Reset mocks
+            mock_get.reset_mock()
+            self.dispatcher.reset_mock()
+            
+            # Mock pollution response
+            pollution_response = MagicMock(status_code=200)
+            pollution_response.json.return_value = {
+                "list": [
+                    {
+                        "dt": int(tomorrow.timestamp()),
+                        "main": {"aqi": test_case["aqi"]},
+                        "components": {
+                            "co": 250.34,
+                            "no2": 15.82,
+                            "o3": 68.66,
+                            "pm2_5": 8.5,
+                            "pm10": 12.3
+                        }
+                    }
+                ]
+            }
+            
+            # Set up the side effect
+            mock_get.side_effect = [geo_response, pollution_response]
+            
+            # Set up tracker
+            self.tracker.get_slot.return_value = "London"
+            
+            # Run the action
+            self.action.run(self.dispatcher, self.tracker, self.domain)
+            
+            # Check the message contains the expected level and description
+            message = self.dispatcher.utter_message.call_args[1]['text']
+            assert test_case["expected_level"] in message
+            assert test_case["expected_desc"] in message
+    
+    @patch('actions.actions_air_pollution_forecast.load_dotenv')
+    @patch('actions.actions_air_pollution_forecast.os.environ.get')
+    @patch('actions.actions_air_pollution_forecast.requests.get')
+    def test_no_forecast_data_handling(self, mock_get, mock_env_get, mock_load_dotenv):
+        """Test handling of missing forecast data """
+        # Setup mocks
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 51.5074, "lon": -0.1278}
+        }
+        
+        # Mock empty pollution response
+        pollution_response = MagicMock(status_code=200)
+        pollution_response.json.return_value = {"list": []}
+        
+        # Set up the side effect
+        mock_get.side_effect = [geo_response, pollution_response]
+        
+        # Set up tracker
+        self.tracker.get_slot.return_value = "London"
+        
+        # Run the action
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check error message
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        assert "couldn't find air pollution forecast data" in message.lower()
+    
+    @patch('actions.actions_air_pollution_forecast.load_dotenv')
+    @patch('actions.actions_air_pollution_forecast.os.environ.get')
+    @patch('actions.actions_air_pollution_forecast.requests.get')
+    def test_api_error_handling(self, mock_get, mock_env_get, mock_load_dotenv):
+        """Test API error handling (related to lines 115-120)."""
+        # Setup mocks
+        mock_env_get.return_value = "fake_api_key"
+        
+        # Mock geo response
+        geo_response = MagicMock(status_code=200)
+        geo_response.json.return_value = {
+            "coord": {"lat": 51.5074, "lon": -0.1278}
+        }
+        
+        # Mock error pollution response
+        pollution_response = MagicMock(status_code=404)
+        
+        # Set up the side effect
+        mock_get.side_effect = [geo_response, pollution_response]
+        
+        # Set up tracker
+        self.tracker.get_slot.return_value = "London"
+        
+        # Run the action
+        self.action.run(self.dispatcher, self.tracker, self.domain)
+        
+        # Check error message
+        message = self.dispatcher.utter_message.call_args[1]['text']
+        assert "couldn't fetch the air quality forecast" in message.lower()
