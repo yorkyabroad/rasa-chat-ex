@@ -112,3 +112,18 @@ The project implements a comprehensive testing strategy:
 - **Caching**: Frequently requested weather data is cached
 - **Asynchronous Processing**: Long-running operations are handled asynchronously
 - **Model Optimization**: NLU models are optimized for performance
+
+### Weather Data Processing
+
+The system processes various types of weather data:
+
+- **Current Weather**: Temperature, weather conditions, humidity
+- **Weather Forecasts**: Multi-day predictions of weather conditions
+- **Temperature Ranges**: Min/max temperatures for today and tomorrow
+- **UV Index**: Current and forecasted UV levels with safety recommendations
+- **Weather Comparisons**: Comparing current conditions to historical averages
+
+Each data type is handled by a specialized action class that:
+1. Retrieves the necessary data from the appropriate API endpoint
+2. Processes and formats the data for user consumption
+3. Provides contextually relevant information based on the data

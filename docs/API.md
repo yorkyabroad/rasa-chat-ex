@@ -143,6 +143,27 @@ Expected pollutant levels:
 Members of sensitive groups may experience health effects. The general public is not likely to be affected.
 ```
 
+### ActionGetTemperatureRange
+
+Fetches temperature range, minimum, or maximum information for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch temperature data for
+- `time_period` (optional): Time period for the forecast ("today" or "tomorrow", default: "today")
+- `temp_type` (optional): Type of temperature information ("range", "min", "max", default: "range")
+
+**Returns:**
+- For "range": Temperature range (minimum and maximum) for the specified time period
+- For "min": Minimum temperature for the specified time period
+- For "max": Maximum temperature for the specified time period
+
+**Example Responses:**
+
+The temperature range in London today is between 18.0°C and 25.0°C. Currently it's 22.5°C.
+The minimum temperature in Paris today is 16.5°C.
+The maximum temperature in New York tomorrow will be around 28.0°C.
+The temperature in Tokyo tomorrow will range between 20.0°C and 27.0°C.
+
 ### ActionCompareWeather
 
 Compares current weather with historical or forecast data.

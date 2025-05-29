@@ -106,6 +106,26 @@ Bot: *Provides air pollution forecast for tomorrow*
 User: "Is the air quality dangerous in Delhi today?"
 Bot: *Provides air quality risk assessment and health implications*
 
+### 3.3 Temperature Range Queries
+
+User: "What's the temperature range in London today?"
+Bot: *Provides today's minimum and maximum temperatures for London*
+
+User: "What will the temperature range be in Paris tomorrow?"
+Bot: *Provides tomorrow's forecasted temperature range for Paris*
+
+User: "What's the minimum temperature in New York today?"
+Bot: *Provides today's minimum temperature for New York*
+
+User: "What's the maximum temperature in Tokyo tomorrow?"
+Bot: *Provides tomorrow's forecasted maximum temperature for Tokyo*
+
+User: "How cold will it get in Moscow tomorrow?"
+Bot: *Provides tomorrow's forecasted minimum temperature for Moscow*
+
+User: "How hot will it get in Dubai today?"
+Bot: *Provides today's maximum temperature for Dubai*
+
 ### 4. Time-Based Weather Queries
 
 User: "What's the weather like in London at 3pm?"
