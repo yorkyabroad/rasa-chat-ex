@@ -16,6 +16,11 @@ intents:
   - ask_humidity  # Intent for asking about humidity in a location
   - ask_uv_index  # Intent for asking about UV index in a location
   - ask_uv_index_forecast  # Intent for asking about future UV index
+#  - ask_local_time  # Add this intent
+#  - ask_date  # Add this intent
+#  - ask_location  # Add this intent
+#  - ask_number_of_people  # Add this intent
+  - ask_temperature_range
   - ask_air_pollution  # Intent for asking about air pollution in a location
   - ask_air_pollution_forecast  # Intent for asking about air pollution in a location
 
@@ -34,6 +39,7 @@ actions:
   - action_get_humidity  # Action for retrieving humidity data from OpenWeather API
   - action_get_uv_index  # Action for retrieving UV index data from OpenWeather API
   - action_get_uv_index_forecast  # Action for retrieving UV index forecast
+  - action_get_temperature_range
   - action_get_air_pollution  # Action for retrieving air pollution data from OpenWeather API
   - action_get_air_pollution_forecast  # Action for retrieving air pollution forecast
 
@@ -42,6 +48,8 @@ entities:
   - time
   - date
   - location
+  - time_period
+  - temp_type
 
 slots:
   number_of_people:
@@ -67,6 +75,26 @@ slots:
     mappings:
       - type: from_entity
         entity: location
+
+  time_period:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: time_period
+
+  temp_type:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: temp_type
+
+
+#forms:
+#  restaurant_form:
+#    required_slots:
+#      - number_of_people
+#      - time
+#      - date
 
 responses:
   utter_greet:

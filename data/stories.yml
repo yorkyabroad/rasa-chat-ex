@@ -79,3 +79,13 @@ stories:
     entities:
     - location: "Paris"
   - action: action_get_air_pollution_forecast
+
+
+- story: temperature range query
+  steps:
+    - intent: ask_temperature_range
+      entities:
+        - location: "London"
+        - time_period: "today"
+        - temp_type: "range"
+    - action: action_get_temperature_range

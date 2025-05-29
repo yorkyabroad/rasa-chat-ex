@@ -561,6 +561,104 @@ class ActionGetUVIndexForecast(Action):
         else:
             return "Take all precautions: SPF 30+ sunscreen, protective clothing, wide-brim hat, and UV-blocking sunglasses. Avoid sun exposure as much as possible."
 
+class ActionGetTemperatureRange(Action):
+    def name(self) -> Text:
+        return "action_get_temperature_range"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, 
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        location = tracker.get_slot("location")
+        time_period = tracker.get_slot("time_period") or "today"
+        temp_type = tracker.get_slot("temp_type") or "range"  # range, min, max
+        
+        if not location:
+            dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
+            return []
+
+        load_dotenv()
+        api_key = os.environ.get("OPENWEATHER_API_KEY")
+        if not api_key:
+            dispatcher.utter_message(text="Weather service is currently unavailable.")
+            return []
+        
+        try:
+            # For today's temperature range, use current weather API
+            if time_period.lower() == "today":
+                url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}&units=metric"
+                logger.info(f"Fetching current weather data for location: {location}")
+                response = requests.get(url, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    temp_min = data["main"]["temp_min"]
+                    temp_max = data["main"]["temp_max"]
+                    current_temp = data["main"]["temp"]
+                    
+                    if temp_type.lower() == "min":
+                        dispatcher.utter_message(
+                            text=f"The minimum temperature in {location} today is {temp_min}°C."
+                        )
+                    elif temp_type.lower() == "max":
+                        dispatcher.utter_message(
+                            text=f"The maximum temperature in {location} today is {temp_max}°C."
+                        )
+                    else:  # range
+                        dispatcher.utter_message(
+                            text=f"The temperature range in {location} today is between {temp_min}°C and {temp_max}°C. Currently it's {current_temp}°C."
+                        )
+                else:
+                    logger.error(f"Failed to fetch weather data: HTTP {response.status_code} for location {location}")
+                    dispatcher.utter_message(text="I couldn't fetch the weather for that location. Try again.")
+            
+            # For tomorrow's temperature range, use forecast API
+            else:
+                url = f"http://api.openweathermap.org/data/2.5/forecast?q={location}&appid={api_key}&units=metric"
+                logger.info(f"Fetching forecast data for location: {location}")
+                response = requests.get(url, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Get tomorrow's date
+                    tomorrow = (datetime.datetime.now() + datetime.timedelta(days=1)).date()
+                    
+                    # Filter forecast items for tomorrow
+                    tomorrow_forecasts = [
+                        item for item in data["list"] 
+                        if datetime.datetime.fromtimestamp(item["dt"]).date() == tomorrow
+                    ]
+                    
+                    if tomorrow_forecasts:
+                        # Find min and max temperatures
+                        temp_min = min(item["main"]["temp_min"] for item in tomorrow_forecasts)
+                        temp_max = max(item["main"]["temp_max"] for item in tomorrow_forecasts)
+                        
+                        if temp_type.lower() == "min":
+                            dispatcher.utter_message(
+                                text=f"The minimum temperature in {location} tomorrow will be around {temp_min}°C."
+                            )
+                        elif temp_type.lower() == "max":
+                            dispatcher.utter_message(
+                                text=f"The maximum temperature in {location} tomorrow will be around {temp_max}°C."
+                            )
+                        else:  # range
+                            dispatcher.utter_message(
+                                text=f"The temperature in {location} tomorrow will range between {temp_min}°C and {temp_max}°C."
+                            )
+                    else:
+                        dispatcher.utter_message(
+                            text=f"I couldn't find forecast data for {location} tomorrow."
+                        )
+                else:
+                    logger.error(f"Failed to fetch forecast data: HTTP {response.status_code} for location {location}")
+                    dispatcher.utter_message(text="I couldn't fetch the forecast for that location. Try again.")
+                    
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Weather API request error for {location}: {str(e)}")
+            dispatcher.utter_message(text="Sorry, I encountered an error while fetching the weather data.")
+        
+        return []
+
 class ActionGetAirPollution(Action):
     def name(self) -> Text:
         return "action_get_air_pollution"

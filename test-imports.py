@@ -12,6 +12,7 @@ try:
     import rasa_sdk
     import requests
     import dotenv
+    import tenacity
     # All required packages are installed!
     logger.info("All required packages are installed!")
 except ImportError as e:

@@ -185,6 +185,25 @@ nlu:
     - UV radiation forecast for [Miami](location)
     - Will it be sunny and high UV in [Los Angeles](location) tomorrow?
 
+- intent: ask_temperature_range
+  examples: |
+    - What is the temperature range in [London](location) [today](time_period)?
+    - What is the temperature range in [Paris](location) [tomorrow](time_period)?
+    - What's the temperature range for [New York](location) [today](time_period)?
+    - What will the temperature range be in [Tokyo](location) [tomorrow](time_period)?
+    - Tell me the temperature range for [Berlin](location) [today](time_period)
+    - What are the high and low temperatures in [Sydney](location) [tomorrow](time_period)?
+    - What's the [minimum](temp_type) temperature in [Miami](location) [today](time_period)?
+    - What's the [maximum](temp_type) temperature in [Chicago](location) [tomorrow](time_period)?
+    - What will the [maximum](temp_type) temperature be in [Chicago](location) [tomorrow](time_period)?
+    - What's the [min](temp_type) temperature for [Barcelona](location) [today](time_period)?
+    - What's the [max](temp_type) temperature for [Rome](location) [tomorrow](time_period)?
+    - How cold will it get in [Moscow](location) [tomorrow](time_period)?
+    - How hot will it get in [Dubai](location) [today](time_period)?
+    - What's the temperature range like in [Singapore](location) [today](time_period)?
+    - What's the [lowest](temp_type) temperature in [Oslo](location) [tomorrow](time_period)?
+    - What's the [highest](temp_type) temperature in [Cairo](location) [today](time_period)?
+
 - intent: ask_air_pollution
   examples: |
     - What is the air pollution in [London](location)?
