@@ -1,12 +1,14 @@
 # tests/test_weather_utils.py
 import pytest
 from unittest.mock import patch, MagicMock
+import logging
 import requests
+import os
 from actions.weather_utils import (
     WeatherService, WeatherAPIError, UVInfo, fetch_with_retry,
     get_coordinates, get_uv_level, get_protection_advice,
     validate_env_vars, get_api_key, fetch_current_weather,
-    fetch_weather_forecast, has_tenacity
+    fetch_weather_forecast, has_tenacity, API_ENDPOINTS
 )
 
 class TestWeatherUtils:
@@ -265,3 +267,92 @@ class TestWeatherUtils:
         response = fetch_with_retry("http://example.com")
         assert response is not None
         mock_get.assert_called_with("http://example.com", timeout=10)
+
+        # Test for lines 18-19 (has_tenacity check)
+    def test_has_tenacity_flag(self):
+        """Test has_tenacity flag (lines 18-19)."""
+        # This is a bit tricky to test directly since it's set at import time
+        # We can at least verify it's a boolean
+        assert isinstance(has_tenacity, bool)
+    
+    # Test for line 29 (API_ENDPOINTS configuration)
+    def test_api_endpoints_config(self):
+        """Test API_ENDPOINTS configuration (line 29)."""
+        assert "current_weather" in API_ENDPOINTS
+        assert "forecast" in API_ENDPOINTS
+        assert "uv_index" in API_ENDPOINTS
+        assert "uv_forecast" in API_ENDPOINTS
+        
+        # Check that the endpoints are properly formatted
+        for endpoint in API_ENDPOINTS.values():
+            assert endpoint.startswith("http://")
+            assert "openweathermap.org" in endpoint
+    
+    # Test for line 43 (fetch_with_retry function)
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_retry(self, mock_get):
+        """Test fetch_with_retry function (line 43)."""
+        # Setup mock
+        mock_response = MagicMock()
+        mock_get.return_value = mock_response
+        
+        # Call the function
+        result = fetch_with_retry("http://test-url.com")
+        
+        # Verify results
+        assert result == mock_response
+        mock_get.assert_called_once_with("http://test-url.com", timeout=10)
+    
+    # Test for line 45 (fetch_with_retry error handling)
+    @patch('actions.weather_utils.requests.get')
+    def test_fetch_with_retry_error(self, mock_get):
+        """Test fetch_with_retry error handling (line 45)."""
+        # Setup mock to raise exception
+        mock_get.side_effect = requests.exceptions.RequestException("Connection error")
+        
+        # Call the function and expect exception
+        # Note: If tenacity is active, this might not raise immediately
+        if not has_tenacity:
+            with pytest.raises(requests.exceptions.RequestException):
+                fetch_with_retry("http://test-url.com")
+    
+    # Test for lines 224-226 (validate_env_vars function)
+    @patch('actions.weather_utils.os.environ.get')
+    @patch('actions.weather_utils.load_dotenv')
+    def test_validate_env_vars_all_present(self, mock_load_dotenv, mock_env_get):
+        """Test validate_env_vars with all variables present (lines 224-226)."""
+        # Setup mock
+        mock_env_get.return_value = "test_value"
+        
+        # Call the function
+        result = validate_env_vars(["VAR1", "VAR2"])
+        
+        # Verify results
+        assert result is True
+        assert mock_load_dotenv.called
+    
+    @patch('actions.weather_utils.os.environ.get')
+    @patch('actions.weather_utils.load_dotenv')
+    def test_validate_env_vars_missing(self, mock_load_dotenv, mock_env_get):
+        """Test validate_env_vars with missing variables (lines 224-226)."""
+        # Setup mock
+        mock_env_get.side_effect = lambda x: None if x == "VAR2" else "test_value"
+        
+        # Call the function
+        result = validate_env_vars(["VAR1", "VAR2"])
+        
+        # Verify results
+        assert result is False
+        assert mock_load_dotenv.called
+    
+    # Additional test for get_api_key function
+    @patch('actions.weather_utils.os.environ.get')
+    def test_get_api_key(self, mock_env_get):
+        """Test get_api_key function."""
+        # Test with API key present
+        mock_env_get.return_value = "test_api_key"
+        assert get_api_key() == "test_api_key"
+        
+        # Test with API key missing
+        mock_env_get.return_value = None
+        assert get_api_key() is None
