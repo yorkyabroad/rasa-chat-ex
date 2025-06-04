@@ -232,3 +232,67 @@ nlu:
     - Will the air be polluted in [Los Angeles](location) tomorrow?
     - Air pollution forecast for [Shanghai](location) tomorrow
 
+- intent: ask_severe_weather_alerts
+  examples: |
+    - Are there any weather alerts for [London](location)?
+    - Is there a storm warning in [New York](location)?
+    - Will there be any severe weather today in [Tokyo](location)?
+    - Any weather warnings for [Paris](location)?
+    - Are there any alerts for [Berlin](location)?
+    - Check for weather alerts in [Sydney](location)
+    - Any severe weather expected in [Moscow](location)?
+    - Weather warnings for [Chicago](location)
+    - Storm alerts for [Miami](location)
+    - Any dangerous weather conditions in [Los Angeles](location)?
+
+- intent: ask_precipitation
+  examples: |
+    - What's the chance of rain in [London](location) tomorrow?
+    - Will it snow in [New York](location) this weekend?
+    - How much rainfall is expected in [Tokyo](location) today?
+    - Is it going to rain in [Paris](location)?
+    - What's the precipitation forecast for [Berlin](location)?
+    - Will I need an umbrella in [Sydney](location) today?
+    - Any chance of snow in [Moscow](location) tomorrow?
+    - Rain forecast for [Chicago](location)
+    - Will it be wet in [Miami](location) today?
+    - Precipitation outlook for [Los Angeles](location)
+
+- intent: ask_wind_conditions
+  examples: |
+    - How windy will it be in [London](location) today?
+    - What's the wind direction in [New York](location)?
+    - Is it too windy for outdoor activities in [Tokyo](location)?
+    - What's the wind speed in [Paris](location)?
+    - Wind forecast for [Berlin](location)
+    - Is it breezy in [Sydney](location) today?
+    - How strong is the wind in [Moscow](location)?
+    - Wind conditions in [Chicago](location)
+    - Is it safe to sail in [Miami](location) today?
+    - Will it be windy in [Los Angeles](location) tomorrow?
+
+- intent: ask_sunrise_sunset
+  examples: |
+    - When is sunrise in [London](location) today?
+    - What time does the sun set in [New York](location)?
+    - How many hours of daylight in [Tokyo](location) today?
+    - Sunrise time for [Paris](location)
+    - Sunset time in [Berlin](location)
+    - When will the sun rise tomorrow in [Sydney](location)?
+    - How long is the day in [Moscow](location)?
+    - Daylight hours in [Chicago](location)
+    - What time is sunset in [Miami](location) today?
+    - When does the sun come up in [Los Angeles](location)?
+
+- intent: ask_weather_comparison
+  examples: |
+    - Is today warmer than yesterday in [London](location)?
+    - How does today's weather compare to yesterday in [New York](location)?
+    - Is [Tokyo](location) colder today than yesterday?
+    - Compare today and yesterday's weather in [Paris](location)
+    - Weather difference between today and yesterday in [Berlin](location)
+    - Is it warmer or colder than yesterday in [Sydney](location)?
+    - Temperature comparison with yesterday for [Moscow](location)
+    - How much has the temperature changed since yesterday in [Chicago](location)?
+    - Is today's weather better than yesterday in [Miami](location)?
+    - Weather change since yesterday in [Los Angeles](location)

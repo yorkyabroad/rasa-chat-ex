@@ -8,23 +8,26 @@ intents:
   - mood_great
   - mood_unhappy
   - bot_challenge
-  - ask_weather  # Add this intent
-  - ask_time     # Add this intent
-  - ask_weather_forecast  # Add this intent
-  - compare_weather  # Add this intent
-  - random_fact  # Add this intent
-  - ask_humidity  # Intent for asking about humidity in a location
-  - ask_uv_index  # Intent for asking about UV index in a location
-  - ask_uv_index_forecast  # Intent for asking about future UV index
-#  - ask_local_time  # Add this intent
-#  - ask_date  # Add this intent
-#  - ask_location  # Add this intent
-#  - ask_number_of_people  # Add this intent
+  - ask_weather
+  - ask_time
+  - ask_weather_forecast
+  - compare_weather
+  - random_fact
+  - ask_humidity
+  - ask_uv_index
+  - ask_uv_index_forecast
+#  - ask_local_time
+#  - ask_date
+#  - ask_location
+#  - ask_number_of_people
   - ask_temperature_range
-  - ask_air_pollution  # Intent for asking about air pollution in a location
-  - ask_air_pollution_forecast  # Intent for asking about air pollution in a location
-
-
+  - ask_air_pollution
+  - ask_air_pollution_forecast
+  - ask_severe_weather_alerts
+  - ask_precipitation
+  - ask_wind_conditions
+  - ask_sunrise_sunset
+  - ask_weather_comparison
 
 actions:
   - action_fetch_weather
@@ -36,12 +39,17 @@ actions:
   - action_ask_date
   - action_ask_location
   - action_confirmation
-  - action_get_humidity  # Action for retrieving humidity data from OpenWeather API
-  - action_get_uv_index  # Action for retrieving UV index data from OpenWeather API
-  - action_get_uv_index_forecast  # Action for retrieving UV index forecast
+  - action_get_humidity
+  - action_get_uv_index
+  - action_get_uv_index_forecast
   - action_get_temperature_range
-  - action_get_air_pollution  # Action for retrieving air pollution data from OpenWeather API
-  - action_get_air_pollution_forecast  # Action for retrieving air pollution forecast
+  - action_get_air_pollution
+  - action_get_air_pollution_forecast
+  - action_get_severe_weather_alerts
+  - action_get_precipitation
+  - action_get_wind_conditions
+  - action_get_sunrise_sunset
+  - action_get_weather_comparison
 
 entities:
   - number_of_people
@@ -87,14 +95,6 @@ slots:
     mappings:
       - type: from_entity
         entity: temp_type
-
-
-#forms:
-#  restaurant_form:
-#    required_slots:
-#      - number_of_people
-#      - time
-#      - date
 
 responses:
   utter_greet:
