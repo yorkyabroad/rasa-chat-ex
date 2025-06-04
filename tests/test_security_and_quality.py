@@ -10,6 +10,12 @@ class TestSecurityAndQuality(unittest.TestCase):
 
     def test_security_vulnerabilities(self):
         """Test that Python files don't contain security vulnerabilities using Bandit."""
+        # Skip test if bandit is not installed
+        try:
+            subprocess.run(["bandit", "--version"], capture_output=True, shell=False)
+        except FileNotFoundError:
+            self.skipTest("bandit not installed")
+            
         # Get the project root directory
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         
@@ -39,6 +45,12 @@ class TestSecurityAndQuality(unittest.TestCase):
 
     def test_dependency_vulnerabilities(self):
         """Test that dependencies don't have known vulnerabilities."""
+        # Skip test if safety is not installed
+        try:
+            subprocess.run(["safety", "--version"], capture_output=True, shell=False)
+        except FileNotFoundError:
+            self.skipTest("safety not installed")
+            
         # Run safety check on requirements
         result = subprocess.run(
             ["safety", "check", "--file=requirements.txt", "--json"],

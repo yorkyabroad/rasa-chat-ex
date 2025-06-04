@@ -24,6 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          pip install bandit pylint safety
           
       - name: Run Bandit security scan
         run: bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests,htmlcov -s B603
