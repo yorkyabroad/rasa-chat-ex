@@ -117,3 +117,36 @@ See [docs/API.md](docs/API.md) for detailed API documentation.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Rasa Chat
+
+## Code Quality and Security
+
+This project uses several tools to ensure code quality and security:
+
+- **Bandit**: Security vulnerability scanning
+- **Pylint**: Static code analysis
+- **Safety**: Dependency vulnerability scanning
+- **Liccheck**: License compliance checking
+- **Pytest with Coverage**: Test coverage reporting
+
+### Running Code Quality Checks
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run security scan
+bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests
+
+# Run static code analysis
+pylint actions/
+
+# Check for vulnerable dependencies
+safety check -r requirements.txt
+
+# Check license compliance
+liccheck -r requirements.txt
+
+# Run tests with coverage
+pytest --cov=actions tests/
+```

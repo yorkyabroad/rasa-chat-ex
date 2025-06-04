@@ -1,0 +1,20 @@
+[tool.bandit]
+exclude_dirs = [".git", "__pycache__", ".pytest_cache", "venv", "env", "tests", "htmlcov"]
+skips = ["B101", "B311"]
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111", # missing-docstring
+    "C0103", # invalid-name
+    "C0303", # trailing-whitespace
+    "C0330", # bad-continuation
+    "C1801", # len-as-condition
+    "W0511", # fixme
+    "R0903", # too-few-public-methods
+    "R0913", # too-many-arguments
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
