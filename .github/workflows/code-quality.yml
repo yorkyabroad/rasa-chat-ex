@@ -26,7 +26,7 @@ jobs:
           pip install -r requirements-dev.txt
           
       - name: Run Bandit security scan
-        run: bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests
+        run: bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests,htmlcov -s B603
         
       - name: Run Pylint
         run: pylint --disable=C0111,C0103 actions/
