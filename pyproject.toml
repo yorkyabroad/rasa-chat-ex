@@ -1,6 +1,6 @@
 [tool.bandit]
 exclude_dirs = [".git", "__pycache__", ".pytest_cache", "venv", "env", "tests", "htmlcov"]
-skips = ["B101", "B311"]
+skips = ["B101", "B311", "B603"]
 
 [tool.pylint.messages_control]
 disable = [

@@ -10,6 +10,12 @@ class TestSecurityAndQuality(unittest.TestCase):
 
     def test_security_vulnerabilities(self):
         """Test that Python files don't contain security vulnerabilities using Bandit."""
+        # Skip test if bandit is not installed
+        try:
+            subprocess.run(["bandit", "--version"], capture_output=True, shell=False)
+        except FileNotFoundError:
+            self.skipTest("bandit not installed")
+            
         # Get the project root directory
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         
@@ -17,7 +23,8 @@ class TestSecurityAndQuality(unittest.TestCase):
         result = subprocess.run(
             ["bandit", "-r", project_root, "-f", "json", "-x", ".git,__pycache__,.pytest_cache,venv,env,tests,htmlcov"],
             capture_output=True,
-            text=True
+            text=True,
+            shell=False  # Explicitly set shell=False for security
         )
         
         # Only fail on high and medium severity issues
@@ -38,11 +45,18 @@ class TestSecurityAndQuality(unittest.TestCase):
 
     def test_dependency_vulnerabilities(self):
         """Test that dependencies don't have known vulnerabilities."""
+        # Skip test if safety is not installed
+        try:
+            subprocess.run(["safety", "--version"], capture_output=True, shell=False)
+        except FileNotFoundError:
+            self.skipTest("safety not installed")
+            
         # Run safety check on requirements
         result = subprocess.run(
-            ["safety", "check", "--file=requirements.txt", "--json", "--ignore-unpinned"],
+            ["safety", "check", "--file=requirements.txt", "--json"],
             capture_output=True,
-            text=True
+            text=True,
+            shell=False  # Explicitly set shell=False for security
         )
         
         try:
@@ -64,7 +78,7 @@ class TestSecurityAndQuality(unittest.TestCase):
         """Test that dependencies comply with allowed licenses."""
         # Skip this test if liccheck is not installed
         try:
-            subprocess.run(["liccheck", "--version"], capture_output=True)
+            subprocess.run(["liccheck", "--version"], capture_output=True, shell=False)
         except FileNotFoundError:
             self.skipTest("liccheck not installed")
             
@@ -97,7 +111,8 @@ unauthorized_licenses:
             result = subprocess.run(
                 ["liccheck", "-s", config_path, "-r", "requirements.txt", "--no-deps"],
                 capture_output=True,
-                text=True
+                text=True,
+                shell=False  # Explicitly set shell=False for security
             )
             
             # Check if there were unauthorized licenses
