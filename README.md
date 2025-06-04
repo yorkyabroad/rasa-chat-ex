@@ -150,3 +150,28 @@ liccheck -r requirements.txt
 # Run tests with coverage
 pytest --cov=actions tests/
 ```
+
+## Weather Features
+
+The chatbot includes a comprehensive set of weather-related features:
+
+### Basic Weather Information
+- Current weather conditions
+- Weather forecasts
+- Temperature ranges
+- Humidity levels
+
+### Air Quality Information
+- Current air pollution data
+- Air pollution forecasts
+- UV index information
+- UV index forecasts
+
+### Extended Weather Features
+- Severe weather alerts and warnings
+- Precipitation details (rain/snow forecasts)
+- Wind conditions (speed, direction, recommendations)
+- Sunrise and sunset times
+- Weather comparisons (today vs. yesterday)
+
+For more details on the available weather features and example queries, see [Weather Features Documentation](docs/WEATHER_FEATURES.md).

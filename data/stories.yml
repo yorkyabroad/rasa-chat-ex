@@ -89,3 +89,42 @@ stories:
         - time_period: "today"
         - temp_type: "range"
     - action: action_get_temperature_range
+- story: severe weather alerts query
+  steps:
+    - intent: ask_severe_weather_alerts
+      entities:
+        - location: "London"
+        - location: "New York"
+    - action: action_get_severe_weather_alerts
+
+- story: precipitation query
+  steps:
+    - intent: ask_precipitation
+      entities:
+        - location: "Paris"
+        - location: "Tokyo"
+    - action: action_get_precipitation
+
+- story: wind conditions query
+  steps:
+    - intent: ask_wind_conditions
+      entities:
+        - location: "Berlin"
+        - location: "Sydney"
+    - action: action_get_wind_conditions
+
+- story: sunrise sunset query
+  steps:
+    - intent: ask_sunrise_sunset
+      entities:
+        - location: "Moscow"
+        - location: "Chicago"
+    - action: action_get_sunrise_sunset
+
+- story: weather comparison query
+  steps:
+    - intent: ask_weather_comparison
+      entities:
+        - location: "Miami"
+        - location: "Los Angeles"
+    - action: action_get_weather_comparison
