@@ -1,0 +1,75 @@
+image: python:3.10
+
+stages:
+  - lint
+  - build
+  - test
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+cache:
+  paths:
+    - .pip-cache/
+    - venv/
+
+before_script:
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+  - pip install pytest pytest-cov flake8 rasa
+
+lint:
+  stage: lint
+  script:
+    - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv/
+
+train-model:
+  stage: build
+  script:
+    - rasa train
+  artifacts:
+    paths:
+      - models/
+    expire_in: 1 week
+
+unit-test:
+  stage: test
+  script:
+    - pytest tests/ --cov=. --cov-report=xml
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+test-nlu:
+  stage: test
+  script:
+    - rasa test nlu --nlu data/nlu.yml --cross-validation
+  needs:
+    - train-model
+  allow_failure: true
+
+test-core:
+  stage: test
+  script:
+    - rasa test core --stories tests/test_stories.yml
+  needs:
+    - train-model
+  allow_failure: true
+
+pages:
+  stage: deploy
+  script:
+    - mkdir -p public/coverage
+    - pytest tests/ --cov=. --cov-report=html:public/coverage
+    - rasa data validate --domain domain.yml
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
