@@ -2,8 +2,8 @@ image: python:3.10
 
 stages:
   - lint
-  - test
   - build
+  - test
   - deploy
 
 variables:
