@@ -2,8 +2,8 @@ image: python:3.10
 
 stages:
   - lint
-  - test
   - build
+  - test
   - deploy
 
 variables:
@@ -19,7 +19,6 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - cd rasa-weather-chat
   - pip install -r requirements.txt
   - pip install pytest pytest-cov flake8
 
@@ -27,6 +26,15 @@ lint:
   stage: lint
   script:
     - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+train-model:
+  stage: build
+  script:
+    - rasa train
+  artifacts:
+    paths:
+      - models/
+    expire_in: 1 week
 
 test:
   stage: test
@@ -37,15 +45,6 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
-
-train-model:
-  stage: build
-  script:
-    - rasa train
-  artifacts:
-    paths:
-      - models/
-    expire_in: 1 week
 
 test-nlu:
   stage: test
