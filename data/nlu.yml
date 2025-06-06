@@ -260,29 +260,47 @@ nlu:
 
 - intent: ask_wind_conditions
   examples: |
-    - How windy will it be in [London](location) today?
-    - What's the wind direction in [New York](location)?
-    - Is it too windy for outdoor activities in [Tokyo](location)?
-    - What's the wind speed in [Paris](location)?
-    - Wind forecast for [Berlin](location)
-    - Is it breezy in [Sydney](location) today?
-    - How strong is the wind in [Moscow](location)?
-    - Wind conditions in [Chicago](location)
-    - Is it safe to sail in [Miami](location) today?
-    - Will it be windy in [Los Angeles](location) tomorrow?
+    - How windy will it be in [London](location) [today](time_period)?
+    - What's the wind direction in [New York](location) [today](time_period)?
+    - Is it too windy for outdoor activities in [Tokyo](location) [today](time_period)?
+    - What's the wind speed in [Paris](location) [today](time_period)?
+    - Wind forecast for [Berlin](location) [today](time_period)
+    - Is it breezy in [Sydney](location) [today](time_period)?
+    - How strong is the wind in [Moscow](location) [today](time_period)?
+    - Wind conditions in [Chicago](location) [today](time_period)
+    - Is it safe to sail in [Miami](location) [today](time_period)?
+    - Will it be windy in [Los Angeles](location) [tomorrow](time_period)?
+    - How windy will it be in [London](location) [tomorrow](time_period)?
+    - What will the wind be like in [New York](location) [tomorrow](time_period)?
+    - Tell me about the wind in [Tokyo](location) [today](time_period)
+    - What's the wind forecast for [Paris](location) [tomorrow](time_period)?
+    - Will it be windy in [Berlin](location) [tomorrow](time_period)?
+    - What are the wind conditions in [Sydney](location) [today](time_period)?
+    - How strong will the wind be in [Moscow](location) [tomorrow](time_period)?
+    - Tell me about the wind speed in [Chicago](location) [today](time_period)
+    - What's the wind direction for [Miami](location) [tomorrow](time_period)?
+    - Will there be strong winds in [Los Angeles](location) [tomorrow](time_period)?
 
 - intent: ask_sunrise_sunset
   examples: |
-    - When is sunrise in [London](location) today?
-    - What time does the sun set in [New York](location)?
-    - How many hours of daylight in [Tokyo](location) today?
-    - Sunrise time for [Paris](location)
-    - Sunset time in [Berlin](location)
-    - When will the sun rise tomorrow in [Sydney](location)?
-    - How long is the day in [Moscow](location)?
-    - Daylight hours in [Chicago](location)
-    - What time is sunset in [Miami](location) today?
-    - When does the sun come up in [Los Angeles](location)?
+    - When is sunrise in [London](location) [today](time_period)?
+    - What time does the sun set in [New York](location) [today](time_period)?
+    - How many hours of daylight in [Tokyo](location) [today](time_period)?
+    - Sunrise time for [Paris](location) [today](time_period)
+    - Sunset time in [Berlin](location) [today](time_period)
+    - When will the sun rise [tomorrow](time_period) in [Sydney](location)?
+    - How long is the day in [Moscow](location) [today](time_period)?
+    - Daylight hours in [Chicago](location) [today](time_period)
+    - What time is sunset in [Miami](location) [today](time_period)?
+    - When does the sun come up in [Los Angeles](location) [today](time_period)?
+    - What time is sunrise in [London](location) [tomorrow](time_period)?
+    - What time will the sun set in [New York](location) [tomorrow](time_period)?
+    - Tell me the sunrise time for [Tokyo](location) [tomorrow](time_period)
+    - Tell me only the sunset time in [Paris](location) [today](time_period)
+    - I just want to know the sunrise time in [Berlin](location) [tomorrow](time_period)
+    - Only tell me when sunset is in [Sydney](location) [today](time_period)
+    - Sunrise [today](time_period) in [Moscow](location)
+    - Sunset [tomorrow](time_period) in [Chicago](location)
 
 - intent: ask_weather_comparison
   examples: |
