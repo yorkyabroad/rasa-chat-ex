@@ -36,7 +36,7 @@ train-model:
       - models/
     expire_in: 1 week
 
-test:
+unit-test:
   stage: test
   script:
     - pytest tests/ --cov=. --cov-report=xml
