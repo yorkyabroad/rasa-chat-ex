@@ -32,7 +32,7 @@ class ActionGetSevereWeatherAlerts(Action):
         
         try:
             # First get coordinates for the location
-            lat, lon = get_coordinates(location, api_key)
+            lat, lon = get_coordinates(location, api_key) # type: ignore
             if not lat or not lon:
                 dispatcher.utter_message(text="I couldn't find that location. Please try again.")
                 return []
@@ -126,7 +126,7 @@ class ActionGetPrecipitation(Action):
         
         try:
             # First get coordinates for the location
-            lat, lon = get_coordinates(location, api_key)
+            lat, lon = get_coordinates(location, api_key) # type: ignore
             if not lat or not lon:
                 dispatcher.utter_message(text="I couldn't find that location. Please try again.")
                 return []
@@ -235,6 +235,20 @@ class ActionGetWindConditions(Action):
         location = tracker.get_slot("location")
         time_period = tracker.get_slot("time_period") or "today"
         
+        # Check message text for time period as backup
+        message_text = ""
+        try:
+            if hasattr(tracker, 'latest_message') and tracker.latest_message:
+                message_text = tracker.latest_message.get('text', '').lower()
+                # Check for tomorrow in the message text
+                if "tomorrow" in message_text:
+                    time_period = "tomorrow"
+                    logger.info(f"Found 'tomorrow' in message text, setting time_period to: {time_period}")
+        except (AttributeError, TypeError):
+            pass
+            
+        logger.info(f"Wind conditions for location: {location}, time_period: {time_period}")
+        
         if not location:
             dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
             return []
@@ -280,7 +294,7 @@ class ActionGetWindConditions(Action):
             # Get tomorrow's wind forecast
             elif time_period.lower() in ["tomorrow"]:
                 # First get coordinates
-                lat, lon = get_coordinates(location, api_key)
+                lat, lon = get_coordinates(location, api_key) # type: ignore
                 if not lat or not lon:
                     dispatcher.utter_message(text="I couldn't find that location. Please try again.")
                     return []
@@ -436,6 +450,15 @@ class ActionGetSunriseSunset(Action):
             # Handle case when latest_message is not available in tests
             message_text = ""
             
+        # Debug log to see what time_period is being extracted
+        logger.info(f"Time period from slot: {time_period}")
+        logger.info(f"Message text: {message_text}")
+        
+        # Check for tomorrow in the message text as a backup
+        if "tomorrow" in message_text:
+            time_period = "tomorrow"
+            logger.info(f"Found 'tomorrow' in message text, setting time_period to: {time_period}")
+            
         sunrise_only = any(term in message_text for term in ['sunrise', 'sun rise', 'sun up', 'come up'])
         sunset_only = any(term in message_text for term in ['sunset', 'sun set', 'sun down'])
         
@@ -487,7 +510,7 @@ class ActionGetSunriseSunset(Action):
             
             elif time_period.lower() in ["tomorrow"]:
                 # First get coordinates
-                lat, lon = get_coordinates(location, api_key)
+                lat, lon = get_coordinates(location, api_key) # type: ignore
                 if not lat or not lon:
                     dispatcher.utter_message(text="I couldn't find that location. Please try again.")
                     return []

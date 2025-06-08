@@ -174,6 +174,140 @@ Compares current weather with historical or forecast data.
 **Returns:**
 - Weather comparison data
 
+### ActionGetSevereWeatherAlerts
+
+Fetches severe weather alerts and warnings for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch alerts for
+
+**Returns:**
+- List of weather alerts with details
+- Alert event type
+- Alert time period
+- Alert description
+- Alert source
+
+**Example Response:**
+```
+Weather alerts for London:
+
+ALERT 1: Thunderstorm
+• From: 2025-06-08 15:00
+• Until: 2025-06-08 21:00
+• Issued by: Met Office
+• Details: Severe thunderstorms expected with potential for lightning strikes and localized flooding...
+```
+
+### ActionGetPrecipitation
+
+Fetches precipitation details including rain and snow forecasts.
+
+**Slots Required:**
+- `location`: The city or location to fetch precipitation data for
+- `time_period` (optional): Time period for the forecast ("today" or "tomorrow", default: "today")
+
+**Returns:**
+- Precipitation probability percentage
+- Expected rainfall amount in mm
+- Expected snowfall amount in mm
+- Duration of precipitation
+
+**Example Response:**
+```
+Precipitation forecast for London today:
+
+• Chance of precipitation: 70%
+• Expected rainfall: 5.2 mm
+• Precipitation expected for approximately 4 hours today
+```
+
+### ActionGetWindConditions
+
+Fetches wind conditions including speed, direction, and recommendations.
+
+**Slots Required:**
+- `location`: The city or location to fetch wind data for
+- `time_period` (optional): Time period for the forecast ("today" or "tomorrow", default: "today")
+
+**Returns:**
+- Wind speed in m/s and km/h
+- Wind direction (compass direction and degrees)
+- Wind gust speed
+- Wind condition description (Beaufort scale)
+- Outdoor activity recommendations
+
+**Example Response:**
+```
+Current wind conditions in London:
+
+• Wind speed: 6.2 m/s (22.3 km/h)
+• Wind direction: Southwest (225°)
+• Wind gusts up to: 9.3 m/s (33.5 km/h)
+• Conditions: Moderate breeze
+• Good for most activities, but might affect precision sports.
+```
+
+### ActionGetSunriseSunset
+
+Fetches sunrise and sunset times for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to fetch sunrise/sunset data for
+- `time_period` (optional): Time period for the data ("today" or "tomorrow", default: "today")
+
+**Returns:**
+- Sunrise time
+- Sunset time
+- Total daylight hours and minutes
+
+**Example Response:**
+```
+Sunrise and sunset times for London today:
+
+• Sunrise: 05:42
+• Sunset: 21:15
+• Daylight hours: 15 hours and 33 minutes
+```
+
+### ActionGetWeatherComparison
+
+Compares today's weather with yesterday's weather for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to compare weather for
+
+**Returns:**
+- Today's weather conditions and temperature
+- Yesterday's weather conditions and temperature
+- Temperature difference comparison
+
+**Example Response:**
+```
+Weather comparison for London:
+
+• Today: partly cloudy, 22.5°C
+• Yesterday: overcast clouds, 19.8°C
+
+Today is 2.7°C warmer than yesterday.
+```
+
+### ActionGetLocalTime
+
+Fetches the current local time for a specified location.
+
+**Slots Required:**
+- `location`: The city or location to get the time for
+
+**Returns:**
+- Current local time for the specified location
+- Date information (optional)
+
+**Example Response:**
+```
+The current time in New York is 14:25 (2:25 PM).
+```
+
 ## Error Responses
 
 All actions may return the following error messages:
