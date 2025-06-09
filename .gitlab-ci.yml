@@ -91,3 +91,33 @@ pages:
       - public
   only:
     - main
+
+  # This job will run on pushes to the 'main' branch
+sync_to_github:
+  stage: deploy
+  image: alpine/git:latest # A lightweight image with git pre-installed
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"' # Only run this job for the 'main' branch
+  script:
+    - echo "Setting up Git user..."
+    - git config --global user.name "GitLab CI" # Set a generic user name for commits
+    - git config --global user.email "mailblog967+github@gmail.com"
+
+    - echo "Adding GitHub remote..."
+    # The GH_PAT variable is automatically available here
+    # Use oauth2:${GH_PAT} for authentication
+    - git remote add github https://oauth2:${GH_PAT}@github.com/yorkyabroad/rasa-chat-ex.git
+    
+    - echo "Pushing to GitHub..."
+    # Push all branches and tags
+    - git push --all github
+    - git push --tags github
+    # Alternatively, to push a specific branch:
+    # - git push github $CI_COMMIT_BRANCH
+
+    # IMPORTANT: If you want to overwrite history on the target, use --force (use with extreme caution)
+    # - git push --all --force github
+  variables:
+    # Ensure this variable name matches the 'Key' you set in GitLab CI/CD settings
+    # The actual value is loaded securely from GitLab's CI/CD variables.
+    GH_PAT: $GH_PAT
