@@ -191,3 +191,8 @@ models
 # ignore local test coverage
 htmlcov
 coverage.xml
+
+#rasa results
+#ignore files with local significane
+results/failed_test_stories.yml
+results/stories_with_warnings.yml
