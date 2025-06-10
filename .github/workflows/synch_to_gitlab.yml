@@ -1,0 +1,36 @@
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - main # Or any other branches you want to sync
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Use a recent version of checkout
+
+      - name: Set Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "mailblog967+github@gmail.com"
+
+      - name: Push to GitLab
+        run: |
+          # Construct the GitLab remote URL with the PAT
+          # Replace YOUR_GITLAB_USERNAME and YOUR_GITLAB_REPO_NAME
+          GITLAB_REMOTE_URL="https://oauth2:${{ secrets.GL_PAT }}@gitlab.com/yorkyabroad/rasa-weather-chat.git"
+
+          # Add the GitLab remote
+          git remote add gitlab $GITLAB_REMOTE_URL
+
+          # Push all branches and tags
+          # Use --force if you need to overwrite history on GitLab (use with caution!)
+          git push --all gitlab
+          git push --tags gitlab
+        env:
+          # The secret is automatically available as an environment variable
+          # named after the secret.
+          GL_PAT: ${{ secrets.GL_PAT }}
