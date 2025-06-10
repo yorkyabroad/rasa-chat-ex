@@ -14,6 +14,11 @@ A Rasa-powered chatbot that provides weather information and forecasts using the
 - Compare weather conditions with historical averages
 - Get humidity information
 - Get local time for any location
+- Get precipitation details (rain/snow forecasts)
+- Get wind conditions (speed, direction, recommendations)
+- Get sunrise and sunset times
+- Get severe weather alerts and warnings
+- Compare today's weather with yesterday's weather
 - Get random interesting facts
 
 ## Prerequisites
@@ -74,12 +79,20 @@ rasa run    # For REST API
 ### Project Structure
 
 ```
-rasa-chat/
+rasa-weather-chat/
 ├── actions/          # Custom actions
+│   ├── actions.py                    # Basic weather actions
+│   ├── actions_weather_extended.py   # Extended weather features
+│   ├── actions_air_pollution.py      # Air pollution actions
+│   └── actions_air_pollution_forecast.py  # Air pollution forecast actions
 ├── data/            # Training data
+│   ├── nlu.yml      # NLU training examples
+│   ├── rules.yml    # Conversation rules
+│   └── stories.yml  # Conversation stories
+├── docs/            # Documentation
 ├── models/          # Trained models
 ├── tests/           # Test files
-└── config/          # Configuration files
+└── scripts/         # Utility scripts
 ```
 
 ### Running Tests
@@ -173,5 +186,9 @@ The chatbot includes a comprehensive set of weather-related features:
 - Wind conditions (speed, direction, recommendations)
 - Sunrise and sunset times
 - Weather comparisons (today vs. yesterday)
+
+### Time and Location Features
+- Get local time for any location
+- Support for cities worldwide
 
 For more details on the available weather features and example queries, see [Weather Features Documentation](docs/WEATHER_FEATURES.md).

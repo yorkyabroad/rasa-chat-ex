@@ -1,30 +1,58 @@
 {
-  "deny": {
+  "ask_uv_index": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 8,
+    "confused_with": {}
+  },
+  "ask_air_pollution": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 9,
+    "confused_with": {}
+  },
+  "mood_great": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 14,
+    "confused_with": {}
+  },
+  "compare_weather": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
     "support": 7,
     "confused_with": {}
   },
-  "ask_date": {
-    "precision": 1.0,
-    "recall": 1.0,
-    "f1-score": 1.0,
-    "support": 5,
-    "confused_with": {}
-  },
-  "ask_humidity": {
+  "ask_weather_forecast": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
     "support": 7,
     "confused_with": {}
   },
-  "goodbye": {
+  "ask_severe_weather_alerts": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
     "support": 10,
+    "confused_with": {}
+  },
+  "greet": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 13,
+    "confused_with": {}
+  },
+  "ask_precipitation": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 12,
     "confused_with": {}
   },
   "affirm": {
@@ -41,28 +69,19 @@
     "support": 14,
     "confused_with": {}
   },
-  "compare_weather": {
+  "random_fact": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
-    "support": 7,
-    "confused_with": {}
-  },
-  "greet": {
-    "precision": 1.0,
-    "recall": 1.0,
-    "f1-score": 1.0,
-    "support": 13,
-    "confused_with": {}
-  },
-  "ask_weather": {
-    "precision": 1.0,
-    "recall": 0.2,
-    "f1-score": 0.33333333333333337,
     "support": 5,
-    "confused_with": {
-      "ask_weather_forecast": 4
-    }
+    "confused_with": {}
+  },
+  "ask_uv_index_forecast": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 11,
+    "confused_with": {}
   },
   "bot_challenge": {
     "precision": 1.0,
@@ -71,44 +90,93 @@
     "support": 4,
     "confused_with": {}
   },
+  "deny": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 7,
+    "confused_with": {}
+  },
+  "ask_weather_comparison": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 10,
+    "confused_with": {}
+  },
+  "goodbye": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 10,
+    "confused_with": {}
+  },
+  "ask_temperature_range": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 16,
+    "confused_with": {}
+  },
+  "ask_air_pollution_forecast": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 12,
+    "confused_with": {}
+  },
   "ask_time": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
-    "support": 6,
+    "support": 15,
     "confused_with": {}
   },
-  "ask_weather_forecast": {
-    "precision": 0.6363636363636364,
-    "recall": 1.0,
-    "f1-score": 0.7777777777777778,
-    "support": 7,
-    "confused_with": {}
-  },
-  "mood_great": {
+  "ask_sunrise_sunset": {
     "precision": 1.0,
     "recall": 1.0,
     "f1-score": 1.0,
-    "support": 14,
+    "support": 19,
     "confused_with": {}
   },
-  "accuracy": 0.9619047619047619,
+  "ask_humidity": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 7,
+    "confused_with": {}
+  },
+  "ask_wind_conditions": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 21,
+    "confused_with": {}
+  },
+  "ask_weather": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 11,
+    "confused_with": {}
+  },
+  "accuracy": 1.0,
   "macro avg": {
-    "precision": 0.9720279720279721,
-    "recall": 0.9384615384615385,
-    "f1-score": 0.9316239316239318,
-    "support": 105
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 248
   },
   "weighted avg": {
-    "precision": 0.9757575757575757,
-    "recall": 0.9619047619047619,
-    "f1-score": 0.9534391534391534,
-    "support": 105
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 248
   },
   "micro avg": {
-    "precision": 0.9619047619047619,
-    "recall": 0.9619047619047619,
-    "f1-score": 0.9619047619047619,
-    "support": 105
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 248
   }
 }
