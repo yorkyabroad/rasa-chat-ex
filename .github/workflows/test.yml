@@ -30,9 +30,15 @@ jobs:
         ls -la
         ls -la tests/
         
-    - name: Run tests
+    - name: Run unit tests
       run: |
-        python -m pytest tests/ -v
+        python -m pytest tests/ -k "not test_e2e" -v
+        
+    - name: Run E2E tests
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+      run: |
+        python -m pytest tests/test_e2e.py -v
         
     - name: Run tests with coverage
       run: |
