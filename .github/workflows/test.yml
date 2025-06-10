@@ -34,6 +34,21 @@ jobs:
       run: |
         python -m pytest tests/ -k "not test_e2e" -v
         
+    - name: Start Rasa server for E2E tests
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+      run: |
+        # Train a model first
+        rasa train
+        # Start Rasa server in background
+        rasa run --enable-api --port 5005 &
+        # Start Actions server in background
+        rasa run actions --debug &
+        # Give servers time to start
+        sleep 30
+        # Check if servers are running
+        curl http://localhost:5005/ || echo "Rasa server not responding"
+        
     - name: Run E2E tests
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}

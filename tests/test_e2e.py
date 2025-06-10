@@ -125,7 +125,30 @@ class TestChatbotE2E:
             # Give servers time to start
             logger.info("Waiting for servers to start...")
             print("Waiting for servers to start...")
-            time.sleep(180)
+            
+            # Wait for servers to be ready with health check
+            max_retries = 30
+            retry_interval = 10
+            server_ready = False
+            
+            for i in range(max_retries):
+                try:
+                    # Check if Rasa server is responding
+                    health_response = requests.get("http://localhost:5005/", timeout=5)
+                    if health_response.status_code == 200:
+                        server_ready = True
+                        logger.info(f"Rasa server is ready after {i * retry_interval} seconds")
+                        print(f"Rasa server is ready after {i * retry_interval} seconds")
+                        break
+                except Exception as e:
+                    print(f"Waiting for Rasa server to be ready... ({i+1}/{max_retries})")
+                    time.sleep(retry_interval)
+            
+            if not server_ready:
+                logger.error("Rasa server failed to start within the timeout period")
+                print("ERROR: Rasa server failed to start within the timeout period")
+                raise Exception("Rasa server failed to start")
+                
             logger.info("Setup complete")
             print("Setup complete")
         except FileNotFoundError as e:
@@ -181,12 +204,24 @@ class TestChatbotE2E:
 
     def send_message(self, message: str) -> Dict[str, Any]:
         """Send a message to the Rasa server and return the response."""
-        response = requests.post(
-            "http://localhost:5005/webhooks/rest/webhook",
-            json={"sender": "test_user", "message": message},
-            timeout=30  # Add a 30-second timeout
-        )
-        return response.json()
+        try:
+            response = requests.post(
+                "http://localhost:5005/webhooks/rest/webhook",
+                json={"sender": "test_user", "message": message},
+                timeout=30  # Add a 30-second timeout
+            )
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.text}")
+            return response.json()
+        except Exception as e:
+            print(f"Error sending message to Rasa server: {str(e)}")
+            # Check if server is running
+            try:
+                health_check = requests.get("http://localhost:5005/", timeout=5)
+                print(f"Server health check: {health_check.status_code}")
+            except Exception as health_e:
+                print(f"Server health check failed: {str(health_e)}")
+            return []
             
     def test_rain_in_stockholm(self):
         """Test asking about rain in Stockholm today."""
