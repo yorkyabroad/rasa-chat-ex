@@ -1,9 +1,12 @@
+attrs<22.2,>=19.3
+packaging<21.0,>=20.0
 pytest==7.4.0
 pytest-cov==4.1.0
 pytest-mock==3.11.1
 responses==0.23.3
 bandit==1.7.5
 pylint==3.0.2
-safety==2.3.5
+safety<2.3.0
 liccheck==0.9.1
-hypothesis==6.92.1
+#hypothesis==6.92.1
+hypothesis<6.0.0

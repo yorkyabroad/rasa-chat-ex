@@ -221,7 +221,7 @@ class TestChatbotE2E:
                 print(f"Server health check: {health_check.status_code}")
             except Exception as health_e:
                 print(f"Server health check failed: {str(health_e)}")
-            return []
+            return [] # type: ignore
             
     def test_rain_in_stockholm(self):
         """Test asking about rain in Stockholm today."""
