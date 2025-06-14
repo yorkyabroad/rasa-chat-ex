@@ -5,6 +5,9 @@ on:
     branches:
       - main # Or any other branches you want to sync
 
+permissions:
+  contents: write
+
 jobs:
   mirror:
     runs-on: ubuntu-latest
