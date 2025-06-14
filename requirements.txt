@@ -1,3 +1,5 @@
+# Rasa is optional for local development
+# rasa>=3.6.0 # Requires Python 3.8-3.10
 rasa-sdk>=3.6.0
 requests>=2.28.0
 python-dotenv>=1.0.0

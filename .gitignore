@@ -197,5 +197,5 @@ coverage.xml
 results/failed_test_stories.yml
 results/stories_with_warnings.yml
 
-#vs code code-space
-rasa-weather-chat.code-workspace
+#ignore vscode workspace files
+*.code-workspace

@@ -60,16 +60,29 @@ class TestSecurityAndQuality(unittest.TestCase):
         )
         
         try:
-            # Parse the JSON output
+            # Parse the JSON output - newer versions of safety return a list directly
             output = json.loads(result.stdout)
-            vulnerabilities = output.get("vulnerabilities", [])
+            
+            # Handle both old and new safety output formats
+            if isinstance(output, dict):
+                vulnerabilities = output.get("vulnerabilities", [])
+            else:
+                vulnerabilities = output  # In newer versions, output is directly a list of vulnerabilities
             
             if vulnerabilities:
-                formatted_vulns = [
-                    f"{vuln['package_name']} {vuln['vulnerable_spec']}: {vuln['advisory']}"
-                    for vuln in vulnerabilities
-                ]
-                self.fail("Vulnerable dependencies found:\n" + "\n".join(formatted_vulns))
+                # Format might differ between versions, so handle both possibilities
+                formatted_vulns = []
+                for vuln in vulnerabilities:
+                    if isinstance(vuln, dict):
+                        if 'package_name' in vuln and 'vulnerable_spec' in vuln:
+                            formatted_vulns.append(
+                                f"{vuln.get('package_name')} {vuln.get('vulnerable_spec')}: {vuln.get('advisory', 'No details')}"
+                            )
+                        else:
+                            formatted_vulns.append(str(vuln))
+                
+                if formatted_vulns:
+                    self.fail("Vulnerable dependencies found:\n" + "\n".join(formatted_vulns))
         except json.JSONDecodeError:
             # Safety might not return valid JSON if there are no vulnerabilities
             pass
