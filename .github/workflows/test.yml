@@ -32,7 +32,7 @@ jobs:
         
     - name: Run unit tests
       run: |
-        python -m pytest tests/ -k "not test_e2e" -v
+        python -m pytest tests/unit/ -v
         
     - name: Start Rasa server for E2E tests
       env:
@@ -53,7 +53,7 @@ jobs:
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
       run: |
-        python -m pytest tests/test_e2e.py -v
+        python -m pytest tests/e2e/test_e2e.py -v
         
     - name: Run tests with coverage
       run: |
