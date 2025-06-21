@@ -33,3 +33,5 @@ pytest --cov=actions
 python -m pytest tests/test_code_standards.py -v
 
 python -m pytest tests/test_code_standards.py -v -W ignore::DeprecationWarning
+
+rasa test --stories tests/test_stories_e2e.yml
