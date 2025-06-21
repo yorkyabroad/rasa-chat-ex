@@ -199,3 +199,7 @@ results/stories_with_warnings.yml
 
 #ignore vscode workspace files
 *.code-workspace
+backend/results/failed_test_stories.yml
+backend/results/stories_with_warnings.yml
+backend/venv-req.txt
+.github/workflows/synch_to_gitlab.yml

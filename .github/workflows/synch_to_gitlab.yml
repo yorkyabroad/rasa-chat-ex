@@ -1,26 +1,26 @@
-name: Sync to GitLab
+#name: Sync to GitLab
 
-on:
-  push:
-    branches:
-      - main # Or any other branches you want to sync
+#on:
+#  push:
+#    branches:
+#      - main # Or any other branches you want to sync
 
-permissions:
-  contents: write
+#permissions:
+#  contents: write
 
-jobs:
-  mirror:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
+#jobs:
+#  mirror:
+#   runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
 #        uses: actions/checkout@v3 # Use a recent version of checkout
 
-      - name: Set Git user
+#      - name: Set Git user
 #        run: |
 #          git config --global user.name "GitHub Actions"
 #          git config --global user.email "mailblog967+github@gmail.com"
 
-      - name: Push to GitLab
+#      - name: Push to GitLab
 #        run: |
           # Construct the GitLab remote URL with the PAT
           # Replace YOUR_GITLAB_USERNAME and YOUR_GITLAB_REPO_NAME
@@ -33,7 +33,7 @@ jobs:
           # Use --force if you need to overwrite history on GitLab (use with caution!)
 #          git push --all gitlab
 #          git push --tags gitlab
-        env:
+#        env:
           # The secret is automatically available as an environment variable
           # named after the secret.
 #          GL_PAT: ${{ secrets.GL_PAT }}

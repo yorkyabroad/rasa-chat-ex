@@ -21,21 +21,26 @@ jobs:
           
       - name: Install dependencies
         run: |
+          working-directory: backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
           pip install bandit pylint safety
           
       - name: Run Bandit security scan
+        working-directory: backend
         run: bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests,htmlcov -s B603 -ll || true
         
       - name: Run Pylint
+        working-directory: backend
         run: pylint --disable=C0111,C0103 actions/ || true
         
       - name: Check for vulnerabilities
+        working-directory: backend
         run: safety check -r requirements.txt || true
         
       - name: Run tests with coverage
+        working-directory: backend
         run: pytest --cov=actions tests/
         
       - name: Upload coverage report
