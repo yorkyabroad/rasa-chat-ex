@@ -1,77 +1,95 @@
-# Rasa Weather Bot
+# Weather Chatbot Backend
 
-A Rasa-powered chatbot that provides weather information and forecasts using the OpenWeather API.
+Rasa-powered chatbot backend that provides comprehensive weather information using the OpenWeather API. This backend serves the React frontend through REST API endpoints.
 
 ## Features
 
-- Get current weather for any location
-- Get weather forecasts for up to 3 days
-- Get UV index information and safety recommendations
-- Get UV index forecasts for future days
-- Get temperature ranges, minimums, and maximums for today and tomorrow
-- Get air pollution data and health recommendations
-- Get air pollution forecasts for tomorrow
-- Compare weather conditions with historical averages
-- Get humidity information
-- Get local time for any location
-- Get precipitation details (rain/snow forecasts)
-- Get wind conditions (speed, direction, recommendations)
-- Get sunrise and sunset times
-- Get severe weather alerts and warnings
-- Compare today's weather with yesterday's weather
-- Get random interesting facts
+### Core Weather Services
+- Current weather conditions for any location
+- Weather forecasts (up to 3 days)
+- Temperature ranges, minimums, and maximums
+- Humidity and precipitation details
+- Wind conditions with speed, direction, and recommendations
+- Sunrise and sunset times
+
+### Advanced Weather Features
+- UV index information and safety recommendations
+- UV index forecasts for future days
+- Air pollution data and health recommendations
+- Air pollution forecasts for tomorrow
+- Severe weather alerts and warnings
+- Weather comparisons (today vs. yesterday, historical averages)
+- Local time for any location worldwide
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- Rasa 3.0 or higher
+- Python 3.8+
+- Rasa 3.6+
 - OpenWeather API key
 
 ## Installation
 
-1. Clone the repository:
+1. **Navigate to backend directory:**
 ```bash
-git clone <repository-url>
-cd rasa-chat
+cd backend
 ```
 
-2. Create a virtual environment:
+2. **Create virtual environment:**
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+3. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables:
+4. **Configure environment:**
 ```bash
 cp .env.example .env
 ```
-Edit `.env` and add your OpenWeather API key:
+Add your OpenWeather API key to `.env`:
 ```
 OPENWEATHER_API_KEY=your_api_key_here
 ```
 
 ## Usage
 
-1. Train the model:
+### Training and Running
+
+1. **Train the model:**
 ```bash
 rasa train
 ```
 
-2. Start the action server:
+2. **Start the action server:**
 ```bash
 rasa run actions
 ```
 
-3. Start the Rasa server:
+3. **Start the Rasa server:**
 ```bash
-rasa shell  # For command line interface
-# or
-rasa run    # For REST API
+# For frontend integration
+rasa run --enable-api --cors "*" --port 5005
+
+# For command line testing
+rasa shell
+```
+
+## API Endpoints
+
+The backend provides REST API endpoints for the frontend:
+
+- **POST** `/webhooks/rest/webhook` - Main chat endpoint
+- **GET** `/` - Health check endpoint
+
+### Example API Usage
+
+```bash
+curl -X POST http://localhost:5005/webhooks/rest/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"sender": "user", "message": "What is the weather in London?"}'
 ```
 
 ## Development
@@ -79,116 +97,123 @@ rasa run    # For REST API
 ### Project Structure
 
 ```
-rasa-weather-chat/
-├── actions/          # Custom actions
-│   ├── actions.py                    # Basic weather actions
-│   ├── actions_weather_extended.py   # Extended weather features
-│   ├── actions_air_pollution.py      # Air pollution actions
-│   └── actions_air_pollution_forecast.py  # Air pollution forecast actions
-├── data/            # Training data
-│   ├── nlu.yml      # NLU training examples
-│   ├── rules.yml    # Conversation rules
-│   └── stories.yml  # Conversation stories
-├── docs/            # Documentation
-├── models/          # Trained models
-├── tests/           # Test files
-└── scripts/         # Utility scripts
+backend/
+├── actions/                    # Custom weather actions
+│   ├── actions.py             # Core weather actions
+│   ├── actions_weather_extended.py  # Extended features
+│   ├── actions_air_pollution.py     # Air quality actions
+│   ├── actions_air_pollution_forecast.py  # Air quality forecasts
+│   ├── weather_utils.py       # Utility functions
+│   └── validate_env.py        # Environment validation
+├── data/                      # Training data
+│   ├── nlu.yml               # Natural language understanding
+│   ├── rules.yml             # Conversation rules
+│   └── stories.yml           # Training stories
+├── docs/                     # Documentation
+├── tests/                    # Unit and E2E tests
+│   ├── unit/                 # Unit tests
+│   └── e2e/                  # End-to-end tests
+├── models/                   # Trained Rasa models
+├── config.yml                # Rasa pipeline configuration
+├── domain.yml                # Chatbot domain definition
+└── endpoints.yml             # Action server configuration
 ```
 
-### Running Tests
+### Testing
 
 ```bash
+# Run all tests
 pytest tests/
+
+# Run unit tests only
+pytest tests/unit/
+
+# Run with coverage
+pytest --cov=actions tests/
+
+# Run E2E tests (requires running servers)
+pytest tests/e2e/
 ```
 
-### Adding New Actions
+### Adding New Weather Features
 
-1. Create a new action class in `actions/actions.py`
-2. Add the action to `domain.yml`
-3. Add training examples to `data/nlu.yml`
-4. Add stories to `data/stories.yml`
-5. Add any necessary tests
+1. **Create action class** in appropriate `actions/` file
+2. **Add to domain.yml** under `actions:` section
+3. **Add training examples** to `data/nlu.yml`
+4. **Create conversation flows** in `data/stories.yml`
+5. **Add unit tests** in `tests/unit/`
+6. **Update documentation** in `docs/`
 
 ## Environment Variables
 
-- `OPENWEATHER_API_KEY`: Your OpenWeather API key (required)
-- `RASA_ENV`: Environment (development/production)
-- `LOG_LEVEL`: Logging level (default: INFO)
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `OPENWEATHER_API_KEY` | OpenWeather API key | Yes |
+| `RASA_ENV` | Environment (dev/prod) | No |
+| `LOG_LEVEL` | Logging level | No |
 
-## API Documentation
+## Documentation
 
-See [docs/API.md](docs/API.md) for detailed API documentation.
+- [API Documentation](docs/API.md)
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Weather Features](docs/WEATHER_FEATURES.md)
+- [Usage Examples](docs/USAGE.md)
+- [Debugging Guide](docs/DEBUGGING.md)
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+See the main project [README](../README.md) for contribution guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 # Rasa Chat
 
-## Code Quality and Security
+## Code Quality
 
-This project uses several tools to ensure code quality and security:
+The backend includes comprehensive quality assurance:
 
+### Quality Tools
 - **Bandit**: Security vulnerability scanning
 - **Pylint**: Static code analysis
-- **Safety**: Dependency vulnerability scanning
-- **Liccheck**: License compliance checking
-- **Pytest with Coverage**: Test coverage reporting
+- **Safety**: Dependency vulnerability checking
+- **Pytest**: Unit and integration testing
+- **Coverage**: Test coverage reporting
 
-### Running Code Quality Checks
+### Running Quality Checks
 
 ```bash
-# Install development dependencies
+# Install dev dependencies
 pip install -r requirements-dev.txt
 
-# Run security scan
+# Security scan
 bandit -r . -x .git,__pycache__,.pytest_cache,venv,env,tests
 
-# Run static code analysis
+# Code analysis
 pylint actions/
 
-# Check for vulnerable dependencies
+# Dependency vulnerabilities
 safety check -r requirements.txt
 
-# Check license compliance
-liccheck -r requirements.txt
-
-# Run tests with coverage
+# Tests with coverage
 pytest --cov=actions tests/
 ```
 
-## Weather Features
+## Deployment
 
-The chatbot includes a comprehensive set of weather-related features:
+For production deployment:
 
-### Basic Weather Information
-- Current weather conditions
-- Weather forecasts
-- Temperature ranges
-- Humidity levels
+1. **Set environment variables**
+2. **Train the model**: `rasa train`
+3. **Start action server**: `rasa run actions --port 5055`
+4. **Start Rasa server**: `rasa run --enable-api --port 5005`
 
-### Air Quality Information
-- Current air pollution data
-- Air pollution forecasts
-- UV index information
-- UV index forecasts
+### Docker Support
 
-### Extended Weather Features
-- Severe weather alerts and warnings
-- Precipitation details (rain/snow forecasts)
-- Wind conditions (speed, direction, recommendations)
-- Sunrise and sunset times
-- Weather comparisons (today vs. yesterday)
+```bash
+# Build image
+docker build -t weather-chatbot-backend .
 
-### Time and Location Features
-- Get local time for any location
-- Support for cities worldwide
-
-For more details on the available weather features and example queries, see [Weather Features Documentation](docs/WEATHER_FEATURES.md).
+# Run container
+docker run -p 5005:5005 -e OPENWEATHER_API_KEY=your_key weather-chatbot-backend
+```
