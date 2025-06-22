@@ -94,3 +94,85 @@ stories:
     entities:
     - location: New York
   - action: action_fetch_weather_forecast
+
+- story: greet and goodbye flow
+  steps:
+  - user: hello
+    intent: greet
+  - action: utter_greet
+  - user: goodbye
+    intent: goodbye
+  - action: utter_goodbye
+
+- story: bot challenge response
+  steps:
+  - user: are you a human?
+    intent: bot_challenge
+  - action: utter_iamabot
+
+- story: humidity in Berlin
+  steps:
+  - user: What is the humidity in Berlin?
+    intent: ask_humidity
+    entities:
+    - location: Berlin
+  - action: action_get_humidity
+
+- story: current air pollution in Delhi
+  steps:
+  - user: What is the air pollution in Delhi?
+    intent: ask_air_pollution
+    entities:
+    - location: Delhi
+  - action: action_get_air_pollution
+
+- story: UV index in Miami today
+  steps:
+  - user: What is the UV index in Miami?
+    intent: ask_uv_index
+    entities:
+    - location: Miami
+  - action: action_get_uv_index
+
+- story: temperature range in Tokyo today
+  steps:
+  - user: What is the temperature range in Tokyo today?
+    intent: ask_temperature_range
+    entities:
+    - location: Tokyo
+    - time_period: today
+  - action: action_get_temperature_range
+
+- story: severe weather alerts in Miami
+  steps:
+  - user: Are there any weather alerts for Miami?
+    intent: ask_severe_weather_alerts
+    entities:
+    - location: Miami
+  - action: action_get_severe_weather_alerts
+
+- story: wind conditions in Chicago today
+  steps:
+  - user: How windy will it be in Chicago today?
+    intent: ask_wind_conditions
+    entities:
+    - location: Chicago
+    - time_period: today
+  - action: action_get_wind_conditions
+
+- story: sunset time in Los Angeles
+  steps:
+  - user: What time does the sun set in Los Angeles today?
+    intent: ask_sunrise_sunset
+    entities:
+    - location: Los Angeles
+    - time_period: today
+  - action: action_get_sunrise_sunset
+
+- story: weather comparison with yesterday
+  steps:
+  - user: Is today warmer than yesterday in Rome?
+    intent: ask_weather_comparison
+    entities:
+    - location: Rome
+  - action: action_get_weather_comparison

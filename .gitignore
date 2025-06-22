@@ -203,3 +203,5 @@ backend/results/failed_test_stories.yml
 backend/results/stories_with_warnings.yml
 backend/venv-req.txt
 .github/workflows/synch_to_gitlab.yml
+frontend/playwright-report
+frontend/test-results

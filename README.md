@@ -24,8 +24,10 @@ This project consists of two main components:
 
 ### User Interface
 - Interactive chat interface
-- Quick action buttons for common requests
-- Pre-configured popular locations
+- Configurable quick action buttons for locations and weather requests
+- Default locations: New York, London, Tokyo, Stockholm
+- Default requests: Current weather, Tomorrow forecast, UV index, Wind conditions
+- Environment-configurable additional buttons (up to 10 locations, 5 requests)
 - Real-time communication with Rasa backend
 - Responsive design for desktop and mobile
 - Visual weather icons and loading states
@@ -59,6 +61,7 @@ rasa train
 ```bash
 cd ../frontend
 npm install
+cp .env.example .env  # Optional: customize quick-action buttons
 ```
 
 ### Running the Application
@@ -125,12 +128,23 @@ The project includes automated code quality checks:
 - Safety (dependency vulnerabilities)
 - Test coverage reporting
 
-## API Integration
+## Configuration
 
+### API Integration
 The application uses the OpenWeather API for weather data. You'll need to:
 1. Sign up at [OpenWeatherMap](https://openweathermap.org/api)
 2. Get your free API key
 3. Add it to `backend/.env` as `OPENWEATHER_API_KEY`
+
+### Frontend Customization
+Customize quick-action buttons in `frontend/.env`:
+```bash
+# Additional locations (up to 10)
+REACT_APP_ADDITIONAL_LOCATIONS=Sydney,Paris,Berlin,Madrid,Rome
+
+# Additional weather requests (up to 5)
+REACT_APP_ADDITIONAL_REQUESTS=Sunset time,Chance of rain,Weather alerts,Air quality,Current time
+```
 
 ## Deployment
 

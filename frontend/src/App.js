@@ -15,11 +15,34 @@ const App = () => {
     // Ref to automatically scroll to the latest message
     const messagesEndRef = useRef(null);
 
+    // Default locations + additional from environment
+    const getLocations = () => {
+        const defaultLocations = ['New York', 'London', 'Tokyo', 'Stockholm'];
+        const additionalLocations = process.env.REACT_APP_ADDITIONAL_LOCATIONS 
+            ? process.env.REACT_APP_ADDITIONAL_LOCATIONS.split(',').map(loc => loc.trim()).slice(0, 10)
+            : [];
+        return [...defaultLocations, ...additionalLocations];
+    };
+
+    // Default weather requests + additional from environment
+    const getWeatherRequests = () => {
+        const defaultRequests = ['Current weather', 'Tomorrow forecast', 'UV index', 'Wind conditions'];
+        const additionalRequests = process.env.REACT_APP_ADDITIONAL_REQUESTS 
+            ? process.env.REACT_APP_ADDITIONAL_REQUESTS.split(',').map(req => req.trim()).slice(0, 5)
+            : [];
+        return [...defaultRequests, ...additionalRequests];
+    };
+
     const getWeatherIcon = (request) => {
         if (request.includes('Current weather')) return '☀️';
         if (request.includes('forecast') || request.includes('Tomorrow')) return '🌤️';
         if (request.includes('UV')) return '🌞';
         if (request.includes('Wind')) return '💨';
+        if (request.includes('Sunset') || request.includes('Sunrise')) return '🌅';
+        if (request.includes('rain') || request.includes('Chance')) return '🌧️';
+        if (request.includes('alert') || request.includes('Weather alerts')) return '⚠️';
+        if (request.includes('Air quality') || request.includes('pollution')) return '🏭';
+        if (request.includes('time') || request.includes('Current time')) return '🕐';
         return '🌡️';
     };
 
@@ -162,7 +185,7 @@ const App = () => {
                         <div style={{marginBottom: '16px'}}>
                             <div style={{marginBottom: '8px', fontSize: '12px', fontWeight: 'bold', color: '#374151'}}>Locations:</div>
                             <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
-                                {['London', 'New York', 'Tokyo', 'Sydney', 'Paris', 'Stockholm', 'Leeds', 'Härnösand', 'Brighton', 'Boden', 'Bordeaux'].map((location, index) => (
+                                {getLocations().map((location, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setSelectedLocation(location)}
@@ -186,7 +209,7 @@ const App = () => {
                         <div style={{marginBottom: '16px'}}>
                             <div style={{marginBottom: '8px', fontSize: '12px', fontWeight: 'bold', color: '#374151'}}>Weather Requests:</div>
                             <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
-                                {['Current weather', 'Tomorrow forecast', 'UV index', 'Wind conditions'].map((request, index) => (
+                                {getWeatherRequests().map((request, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setSelectedRequest(request)}

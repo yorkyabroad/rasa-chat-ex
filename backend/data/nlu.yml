@@ -30,59 +30,6 @@ nlu:
     - bye bye
     - see you later
 
-- intent: affirm
-  examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
-
-- intent: deny
-  examples: |
-    - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
-
-- intent: mood_great
-  examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
-
-- intent: mood_unhappy
-  examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
-
 - intent: bot_challenge
   examples: |
     - are you a bot?
@@ -103,6 +50,12 @@ nlu:
     - How's the weather in [London](location)?
     - What's the weather like in [Tokyo](location)?
     - Weather forecast for [Chicago](location), please.
+    - Current weather in [Paris](location)?
+    - Current weather in [Berlin](location)
+    - Tell me what the weather is like in [Sydney](location)
+    - I need to know the weather in [Beijing](location)
+    - Current weather in [Rome](location)
+    - What's the weather like in [Madrid](location)?
 
 - intent: ask_time
   examples: |
@@ -122,14 +75,6 @@ nlu:
     - What hour is it in [Amsterdam](location)?
     - Time check for [Stockholm](location)
 
-#- intent: ask_date
-#  examples: |
-#    - What's the date in [New York](location)?
-#    - What date is it in [Dublin](location)?
-#    - Tell me the date in [Los Angeles](location).
-#    - How's the date in [London](location)?
-#    - What's the date like in [Tokyo](location)?
-#    - Date for [Chicago](location), please.
 
 - intent: ask_weather_forecast
   examples: |
@@ -140,6 +85,12 @@ nlu:
     - How's the weather in [London](location) next week?
     - What's the weather like in [Tokyo](location) this weekend?
     - Weather forecast for [Chicago](location) next month, please.
+    - Tomorrow forecast in [Paris](location)
+    - Tomorrow forecast in [Berlin](location)
+    - Tell me what the weather is like in [Sydney](location) for the coming days
+    - I need to know the weather in [Beijing](location) the next few days
+    - Tomorrow forecast for [Rome](location)
+    - What's the weather like in [Madrid](location) in next days?
 
 - intent: compare_weather
   examples: |
@@ -293,6 +244,8 @@ nlu:
     - Tell me about the wind speed in [Chicago](location) [today](time_period)
     - What's the wind direction for [Miami](location) [tomorrow](time_period)?
     - Will there be strong winds in [Los Angeles](location) [tomorrow](time_period)?
+    - Wind conditions in [London](location)?
+    - Wind conditions in [Paris](location)
 
 - intent: ask_sunrise_sunset
   examples: |
