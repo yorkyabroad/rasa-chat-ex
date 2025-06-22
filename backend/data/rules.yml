@@ -57,3 +57,43 @@ rules:
   steps:
   - intent: ask_air_pollution_forecast
   - action: action_get_air_pollution_forecast
+
+- rule: Provide random facts
+  steps:
+  - intent: random_fact
+  - action: action_random_fact
+
+- rule: Get UV index forecast
+  steps:
+  - intent: ask_uv_index_forecast
+  - action: action_get_uv_index_forecast
+
+- rule: Get temperature range
+  steps:
+  - intent: ask_temperature_range
+  - action: action_get_temperature_range
+
+- rule: Get severe weather alerts
+  steps:
+  - intent: ask_severe_weather_alerts
+  - action: action_get_severe_weather_alerts
+
+- rule: Get precipitation forecast
+  steps:
+  - intent: ask_precipitation
+  - action: action_get_precipitation
+
+- rule: Get wind conditions
+  steps:
+  - intent: ask_wind_conditions
+  - action: action_get_wind_conditions
+
+- rule: Get sunrise sunset times
+  steps:
+  - intent: ask_sunrise_sunset
+  - action: action_get_sunrise_sunset
+
+- rule: Compare weather with yesterday
+  steps:
+  - intent: ask_weather_comparison
+  - action: action_get_weather_comparison

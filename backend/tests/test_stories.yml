@@ -2,79 +2,12 @@
 #### If you want to learn more, please see the docs: https://rasa.com/docs/rasa/testing-your-assistant
 
 stories:
-- story: happy path 1
+- story: greet user
   steps:
   - user: |
       hello there!
     intent: greet
   - action: utter_greet
-  - user: |
-      amazing
-    intent: mood_great
-  - action: utter_happy
-
-- story: happy path 2
-  steps:
-  - user: |
-      hello there!
-    intent: greet
-  - action: utter_greet
-  - user: |
-      amazing
-    intent: mood_great
-  - action: utter_happy
-  - user: |
-      bye-bye!
-    intent: goodbye
-  - action: utter_goodbye
-
-- story: sad path 1
-  steps:
-  - user: |
-      hello
-    intent: greet
-  - action: utter_greet
-  - user: |
-      not good
-    intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - user: |
-      yes
-    intent: affirm
-  - action: utter_happy
-
-- story: sad path 2
-  steps:
-  - user: |
-      hello
-    intent: greet
-  - action: utter_greet
-  - user: |
-      not good
-    intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - user: |
-      not really
-    intent: deny
-  - action: utter_goodbye
-
-- story: sad path 3
-  steps:
-  - user: |
-      hi
-    intent: greet
-  - action: utter_greet
-  - user: |
-      very terrible
-    intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - user: |
-      no
-    intent: deny
-  - action: utter_goodbye
 
 - story: say goodbye
   steps:
@@ -89,3 +22,59 @@ stories:
       are you a bot?
     intent: bot_challenge
   - action: utter_iamabot
+
+- story: ask weather
+  steps:
+  - user: |
+      What's the weather in London?
+    intent: ask_weather
+  - action: action_fetch_weather
+
+- story: ask weather forecast
+  steps:
+  - user: |
+      What will the weather be in Paris tomorrow?
+    intent: ask_weather_forecast
+  - action: action_fetch_weather_forecast
+
+- story: ask time
+  steps:
+  - user: |
+      What time is it in Tokyo?
+    intent: ask_time
+  - action: action_get_local_time
+
+- story: compare weather
+  steps:
+  - user: |
+      How does the weather in Berlin compare to average?
+    intent: compare_weather
+  - action: action_compare_weather
+
+- story: ask humidity
+  steps:
+  - user: |
+      What is the humidity in Sydney?
+    intent: ask_humidity
+  - action: action_get_humidity
+
+- story: ask uv index
+  steps:
+  - user: |
+      What is the UV index in Miami?
+    intent: ask_uv_index
+  - action: action_get_uv_index
+
+- story: ask air pollution
+  steps:
+  - user: |
+      What is the air pollution in Beijing?
+    intent: ask_air_pollution
+  - action: action_get_air_pollution
+
+- story: ask air pollution forecast
+  steps:
+  - user: |
+      What will the air pollution be in Delhi tomorrow?
+    intent: ask_air_pollution_forecast
+  - action: action_get_air_pollution_forecast

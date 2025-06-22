@@ -58,6 +58,20 @@ Builds the app for production to the `build` folder.
 
 The frontend is configured to connect to the Rasa server at `http://localhost:5005/webhooks/rest/webhook`. Ensure your Rasa server is running before starting the frontend.
 
+### Environment Variables
+
+Create a `.env` file in the frontend directory to customize quick-action buttons:
+
+```bash
+# Additional locations (up to 10)
+REACT_APP_ADDITIONAL_LOCATIONS=Sydney,Paris,Berlin,Madrid,Rome
+
+# Additional weather requests (up to 5)  
+REACT_APP_ADDITIONAL_REQUESTS=Sunset time,Chance of rain,Weather alerts,Air quality,Current time
+```
+
+See `.env.example` for reference configuration.
+
 ## Usage
 
 1. Start the Rasa server (see backend README)
@@ -67,9 +81,18 @@ The frontend is configured to connect to the Rasa server at `http://localhost:50
 
 ## Quick Actions
 
-The interface includes quick action buttons for:
-- **Popular locations**: London, New York, Tokyo, Sydney, Paris, Stockholm, Leeds, etc.
-- **Common requests**: Current weather, Tomorrow forecast, UV index, Wind conditions
+The interface includes configurable quick action buttons:
+
+### Default Locations
+- New York, London, Tokyo, Stockholm (always available)
+
+### Default Weather Requests  
+- Current weather, Tomorrow forecast, UV index, Wind conditions (always available)
+
+### Additional Configuration
+Customize additional buttons via environment variables:
+- **REACT_APP_ADDITIONAL_LOCATIONS**: Up to 10 additional cities
+- **REACT_APP_ADDITIONAL_REQUESTS**: Up to 5 additional weather request types
 
 Select a location and request type, then click "Ask" to send the query automatically.
 

@@ -3,16 +3,11 @@ version: "3.1"
 intents:
   - greet
   - goodbye
-  - affirm
-  - deny
-  - mood_great
-  - mood_unhappy
   - bot_challenge
   - ask_weather
   - ask_time
   - ask_weather_forecast
   - compare_weather
-  - random_fact
   - ask_humidity
   - ask_uv_index
   - ask_uv_index_forecast
@@ -24,6 +19,7 @@ intents:
   - ask_wind_conditions
   - ask_sunrise_sunset
   - ask_weather_comparison
+  - random_fact
 
 actions:
   - action_fetch_weather
@@ -31,10 +27,6 @@ actions:
   - action_get_local_time
   - action_random_fact
   - action_compare_weather
-  - action_ask_time
-  - action_ask_date
-  - action_ask_location
-  - action_confirmation
   - action_get_humidity
   - action_get_uv_index
   - action_get_uv_index_forecast
@@ -95,16 +87,6 @@ slots:
 responses:
   utter_greet:
   - text: "Hey! How are you?"
-
-  utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
-
-  utter_did_that_help:
-  - text: "Did that help you?"
-
-  utter_happy:
-  - text: "Great, carry on!"
 
   utter_goodbye:
   - text: "Bye"
