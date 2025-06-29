@@ -1,0 +1,18 @@
+# Systemd service file for auto-start on Raspberry Pi
+# Save as: /etc/systemd/system/rasa-chat.service
+
+[Unit]
+Description=Rasa Chat Application
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/pi/rasa-chat
+ExecStart=/usr/bin/docker-compose -f docker-compose.pi.yml --env-file .env up -d
+ExecStop=/usr/bin/docker-compose -f docker-compose.pi.yml down
+User=pi
+
+[Install]
+WantedBy=multi-user.target

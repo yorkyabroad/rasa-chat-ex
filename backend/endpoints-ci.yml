@@ -1,0 +1,4 @@
+# Endpoints configuration for CI/GitHub Actions
+
+action_endpoint:
+  url: "http://localhost:5055/webhook"

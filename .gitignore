@@ -196,6 +196,7 @@ coverage.xml
 #ignore files with local significane
 results/failed_test_stories.yml
 results/stories_with_warnings.yml
+results/
 
 #ignore vscode workspace files
 *.code-workspace
@@ -205,3 +206,8 @@ backend/venv-req.txt
 .github/workflows/synch_to_gitlab.yml
 frontend/playwright-report
 frontend/test-results
+
+# Docker deployment
+.env.docker
+rasa-chat-deploy.tar.gz
+rasa-chat-pi-deploy.tar.gz

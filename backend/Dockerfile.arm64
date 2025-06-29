@@ -1,0 +1,33 @@
+FROM python:3.9-slim
+
+# Install system dependencies for ARM64
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Train the model
+RUN rasa train
+
+# Verify model exists
+RUN ls -la models/
+
+EXPOSE 5005
+
+# Use lighter memory settings for Pi
+ENV RASA_TELEMETRY_ENABLED=false
+ENV RASA_DUCKLING_HTTP_URL=""
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:5005 || exit 1
+
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "5005", "--debug"]
