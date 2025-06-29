@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  rasa-actions:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.actions
+    ports:
+      - "5055:5055"
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+    restart: unless-stopped
+
+  rasa-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    depends_on:
+      - rasa-actions
+    environment:
+      - RASA_ACTION_ENDPOINT=http://rasa-actions:5055/webhook
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_RASA_URL=http://${NAS_IP}:5005
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

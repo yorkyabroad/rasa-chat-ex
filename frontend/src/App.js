@@ -50,11 +50,11 @@ const App = () => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
-    const RASA_API_URL = 'http://localhost:5005/webhooks/rest/webhook';
+    const RASA_API_URL = (process.env.REACT_APP_RASA_URL || 'http://localhost:5005') + '/webhooks/rest/webhook';
 
     useEffect(() => {
         console.log("Rasa API URL configured:", RASA_API_URL);
-    }, [RASA_API_URL]);
+    }, []);
 
     useEffect(() => {
         if (messagesEndRef.current) {
