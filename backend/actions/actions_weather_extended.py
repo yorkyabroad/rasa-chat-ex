@@ -114,6 +114,22 @@ class ActionGetPrecipitation(Action):
         location = tracker.get_slot("location")
         time_period = tracker.get_slot("time_period") or "today"
         
+        # Debug logging
+        logger.info(f"Precipitation request - Location: {location}, Time period: {time_period}")
+        
+        # Check message text for time period as backup
+        message_text = ""
+        try:
+            if hasattr(tracker, 'latest_message') and tracker.latest_message:
+                message_text = tracker.latest_message.get('text', '').lower()
+                logger.info(f"Message text: {message_text}")
+                # Check for tomorrow in the message text
+                if "tomorrow" in message_text and time_period != "tomorrow":
+                    time_period = "tomorrow"
+                    logger.info(f"Found 'tomorrow' in message text, setting time_period to: {time_period}")
+        except (AttributeError, TypeError):
+            pass
+        
         if not location:
             dispatcher.utter_message(text="I couldn't find the location. Could you please provide it?")
             return []

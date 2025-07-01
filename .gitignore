@@ -209,5 +209,4 @@ frontend/test-results
 
 # Docker deployment
 .env.docker
-rasa-chat-deploy.tar.gz
 rasa-chat-pi-deploy.tar.gz
