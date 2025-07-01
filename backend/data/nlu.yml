@@ -207,18 +207,21 @@ nlu:
 
 - intent: ask_precipitation
   examples: |
-    - What's the chance of rain in [London](location) tomorrow?
+    - What's the chance of rain in [London](location) [tomorrow](time_period)?
     - Will it snow in [New York](location) this weekend?
-    - Will it rain in [Madrid](location) this tomorrow?
-    - How much rainfall is expected in [Tokyo](location) today?
+    - Will it rain in [Madrid](location) [tomorrow](time_period)?
+    - How much rainfall is expected in [Tokyo](location) [today](time_period)?
     - Is it going to rain in [Paris](location)?
     - What's the precipitation forecast for [Berlin](location)?
-    - Will I need an umbrella in [Sydney](location) today?
-    - Any chance of rain in [Moscow](location) tomorrow?
+    - Will I need an umbrella in [Sydney](location) [today](time_period)?
+    - Any chance of rain in [Moscow](location) [tomorrow](time_period)?
     - Rain forecast for [Chicago](location)
-    - What's the precipitation forecast for [Oslo](location) today?
-    - Will it be wet in [Miami](location) today?
+    - What's the precipitation forecast for [Oslo](location) [today](time_period)?
+    - Will it be wet in [Miami](location) [today](time_period)?
     - Precipitation outlook for [Los Angeles](location)
+    - Will it rain in [Stockholm](location) [tomorrow](time_period)?
+    - Precipitation forecast for [Berlin](location) [tomorrow](time_period)
+    - Rain chances [today](time_period) in [Paris](location)
 
 - intent: ask_wind_conditions
   examples: |
